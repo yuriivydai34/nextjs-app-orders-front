@@ -7,7 +7,7 @@ export async function updateOrder(id: number, data: { ttn?: string; status?: str
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value ?? '';
 
-  const res = await fetch(`http://localhost:3000/payments/${id}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/${id}`, {
     method: 'PATCH',
     headers: {
       Authorization: `Bearer ${token}`,

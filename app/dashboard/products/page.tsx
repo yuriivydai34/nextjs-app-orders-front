@@ -34,7 +34,7 @@ type ProductsResponse = {
 };
 
 async function getProducts(token: string, page: number): Promise<ProductsResponse> {
-  const res = await fetch(`http://localhost:3000/catalog?page=${page}&limit=20`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?page=${page}&limit=20`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: 'no-store',
   });

@@ -38,7 +38,7 @@ type PaymentsResponse = {
 };
 
 async function getPayments(token: string, page: number): Promise<PaymentsResponse> {
-  const res = await fetch(`http://localhost:3000/payments?page=${page}&limit=20`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments?page=${page}&limit=20`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: 'no-store',
   });

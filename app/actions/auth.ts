@@ -3,8 +3,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-const API_URL = 'http://localhost:3000';
-
 export type AuthState = { error?: string } | undefined;
 
 export async function login(state: AuthState, formData: FormData): Promise<AuthState> {
@@ -13,7 +11,7 @@ export async function login(state: AuthState, formData: FormData): Promise<AuthS
 
   let res: Response;
   try {
-    res = await fetch(`${API_URL}/auth/login`, {
+    res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -46,7 +44,7 @@ export async function register(state: AuthState, formData: FormData): Promise<Au
 
   let res: Response;
   try {
-    res = await fetch(`${API_URL}/auth/register`, {
+    res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password }),

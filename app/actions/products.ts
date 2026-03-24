@@ -9,7 +9,7 @@ async function getToken() {
 }
 
 export async function createProduct(data: Record<string, unknown>) {
-  const res = await fetch('http://localhost:3000/catalog', {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${await getToken()}`,
@@ -27,7 +27,7 @@ export async function createProduct(data: Record<string, unknown>) {
 }
 
 export async function updateProduct(id: number, data: Record<string, unknown>) {
-  const res = await fetch(`http://localhost:3000/catalog/${id}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog/${id}`, {
     method: 'PATCH',
     headers: {
       Authorization: `Bearer ${await getToken()}`,
@@ -45,7 +45,7 @@ export async function updateProduct(id: number, data: Record<string, unknown>) {
 }
 
 export async function deleteProduct(id: number) {
-  const res = await fetch(`http://localhost:3000/catalog/${id}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog/${id}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${await getToken()}` },
   });

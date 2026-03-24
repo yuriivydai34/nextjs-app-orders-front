@@ -16,7 +16,7 @@ type CustomersResponse = {
 };
 
 async function getCustomers(token: string, page: number): Promise<CustomersResponse> {
-  const res = await fetch(`http://localhost:3000/accounts?page=${page}&limit=20`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts?page=${page}&limit=20`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: 'no-store',
   });
