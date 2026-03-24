@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import EditOrderModal from './_components/edit-order-modal';
 import OrderProductsModal from './_components/order-products-modal';
+import SortableHeader from './_components/sortable-header';
 
 type Payment = {
   id: number;
@@ -37,11 +38,16 @@ type PaymentsResponse = {
   limit: number;
 };
 
-async function getPayments(token: string, page: number): Promise<PaymentsResponse> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments?page=${page}&limit=20`, {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: 'no-store',
-  });
+async function getPayments(
+  token: string,
+  page: number,
+  sortBy: string,
+  sortOrder: string,
+): Promise<PaymentsResponse> {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/payments?page=${page}&limit=20&sortBy=${sortBy}&sortOrder=${sortOrder}`,
+    { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' },
+  );
 
   if (!res.ok) throw new Error('Failed to fetch payments');
   return res.json();
@@ -64,8 +70,10 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) {
-  const { page: pageParam } = await props.searchParams;
+  const { page: pageParam, sortBy, sortOrder } = await props.searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
+  const sort = typeof sortBy === 'string' ? sortBy : 'createdAt';
+  const order = sortOrder === 'ASC' ? 'ASC' : 'DESC';
 
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value ?? '';
@@ -74,7 +82,7 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
   let error: string | null = null;
 
   try {
-    result = await getPayments(token, page);
+    result = await getPayments(token, page, sort, order);
   } catch {
     error = 'Could not load orders.';
   }
@@ -98,11 +106,11 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-800">
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">ID</th>
+                  <th className="text-left px-4 py-3"><SortableHeader column="id" label="ID" /></th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Order ID</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Amount</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Status</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Created</th>
+                  <th className="text-left px-4 py-3"><SortableHeader column="amount" label="Amount" /></th>
+                  <th className="text-left px-4 py-3"><SortableHeader column="status" label="Status" /></th>
+                  <th className="text-left px-4 py-3"><SortableHeader column="createdAt" label="Created" /></th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Check</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Items</th>
                   <th className="px-4 py-3" />
@@ -158,7 +166,7 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
               {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}
             </p>
             <div className="flex items-center gap-1">
-              <PaginationLink href={`?page=${page - 1}`} disabled={page <= 1}>← Prev</PaginationLink>
+              <PaginationLink href={`?page=${page - 1}&sortBy=${sort}&sortOrder=${order}`} disabled={page <= 1}>← Prev</PaginationLink>
               {Array.from({ length: totalPages }, (_, i) => i + 1)
                 .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
                 .reduce<(number | 'ellipsis')[]>((acc, p, idx, arr) => {
@@ -170,10 +178,10 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                   p === 'ellipsis' ? (
                     <span key={`e-${i}`} className="px-2 text-gray-400">…</span>
                   ) : (
-                    <PaginationLink key={p} href={`?page=${p}`} active={p === page}>{p}</PaginationLink>
+                    <PaginationLink key={p} href={`?page=${p}&sortBy=${sort}&sortOrder=${order}`} active={p === page}>{p}</PaginationLink>
                   )
                 )}
-              <PaginationLink href={`?page=${page + 1}`} disabled={page >= totalPages}>Next →</PaginationLink>
+              <PaginationLink href={`?page=${page + 1}&sortBy=${sort}&sortOrder=${order}`} disabled={page >= totalPages}>Next →</PaginationLink>
             </div>
           </div>
         </>
