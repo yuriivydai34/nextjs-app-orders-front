@@ -3,6 +3,7 @@ import Link from 'next/link';
 import EditOrderModal from './_components/edit-order-modal';
 import OrderProductsModal from './_components/order-products-modal';
 import SortableHeader from './_components/sortable-header';
+import ExportButton from './_components/export-button';
 
 type Payment = {
   id: number;
@@ -94,7 +95,10 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Замовлення</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Замовлення</h2>
+        <ExportButton token={token} />
+      </div>
 
       {error ? (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
