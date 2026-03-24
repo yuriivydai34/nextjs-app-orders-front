@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'gaderia.biz' },
     ],
   },
+  output: 'standalone',
 };
 
 export default nextConfig;
