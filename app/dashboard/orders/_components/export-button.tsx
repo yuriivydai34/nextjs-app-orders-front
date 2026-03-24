@@ -5,15 +5,19 @@ import { useState } from 'react';
 export default function ExportButton({ token }: { token: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [date, setDate] = useState('');
 
   async function handleExport() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/report`, {
+      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/payments/report`);
+      if (date) url.searchParams.set('date', date);
+
+      const res = await fetch(url.toString(), {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Не вдалося створити звіт');
+      if (!res.ok) throw new Error();
       const filePath: string = await res.text();
       window.open(`${process.env.NEXT_PUBLIC_API_URL}${filePath}`);
     } catch {
@@ -26,6 +30,12 @@ export default function ExportButton({ token }: { token: string }) {
   return (
     <div className="flex items-center gap-2">
       {error && <span className="text-xs text-red-500">{error}</span>}
+      <input
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        className="px-3 py-2 rounded-lg text-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600"
+      />
       <button
         onClick={handleExport}
         disabled={loading}
