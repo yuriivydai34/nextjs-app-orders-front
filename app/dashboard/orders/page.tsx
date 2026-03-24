@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
+import EditOrderModal from './_components/edit-order-modal';
 
 type Payment = {
   id: number;
@@ -7,6 +8,7 @@ type Payment = {
   currency: string;
   amount: number;
   status: string;
+  ttn: string | null;
   createdAt: number;
   updatedAt: string;
   cashier_check: { id?: string; message?: string } | null;
@@ -86,6 +88,7 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Status</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Created</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Check</th>
+                  <th className="px-4 py-3" />
                 </tr>
               </thead>
               <tbody>
@@ -117,6 +120,9 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                       ) : (
                         <span className="text-gray-300 dark:text-gray-600">—</span>
                       )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <EditOrderModal id={p.id} ttn={p.ttn ?? ''} status={p.status} />
                     </td>
                   </tr>
                 ))}
