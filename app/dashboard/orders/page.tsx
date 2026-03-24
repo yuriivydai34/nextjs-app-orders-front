@@ -119,9 +119,10 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                     <td className="px-4 py-3">
                       <StatusBadge status={p.status} />
                     </td>
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400">
-                      {new Date(p.createdAt * 1000).toLocaleDateString('en-GB', {
+                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                      {new Date(p.createdAt * 1000).toLocaleString('en-GB', {
                         day: '2-digit', month: 'short', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit',
                       })}
                     </td>
                     <td className="px-4 py-3">
