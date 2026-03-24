@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import EditOrderModal from './_components/edit-order-modal';
+import OrderProductsModal from './_components/order-products-modal';
 
 type Payment = {
   id: number;
@@ -12,6 +13,21 @@ type Payment = {
   createdAt: number;
   updatedAt: string;
   cashier_check: { id?: string; message?: string } | null;
+  catalog_list_id: {
+    id: number;
+    count: number;
+    model_catalog: {
+      id: number;
+      header: string;
+      price: number;
+      price_discount: number;
+      is_discount: boolean;
+      measurement: number;
+      type_measurement: string | null;
+      type_packaging: string | null;
+      picture: string | null;
+    };
+  }[];
 };
 
 type PaymentsResponse = {
@@ -88,6 +104,7 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Status</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Created</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Check</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Items</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -119,6 +136,11 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                         </a>
                       ) : (
                         <span className="text-gray-300 dark:text-gray-600">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      {p.catalog_list_id?.length > 0 && (
+                        <OrderProductsModal orderId={p.id} items={p.catalog_list_id} />
                       )}
                     </td>
                     <td className="px-4 py-3">

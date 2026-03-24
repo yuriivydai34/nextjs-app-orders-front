@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import Image from 'next/image';
 import ProductActions from './_components/product-actions';
+import AddProductModal from './_components/add-product-modal';
 
 type Product = {
   id: number;
@@ -64,10 +65,13 @@ export default async function ProductsPage(props: PageProps<'/dashboard/products
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
-        Products
-        {total > 0 && <span className="ml-2 text-sm font-normal text-gray-400">{total}</span>}
-      </h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          Products
+          {total > 0 && <span className="ml-2 text-sm font-normal text-gray-400">{total}</span>}
+        </h2>
+        <AddProductModal />
+      </div>
 
       {error ? (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>

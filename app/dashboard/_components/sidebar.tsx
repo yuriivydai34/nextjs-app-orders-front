@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { logout } from '@/app/actions/auth';
 
@@ -18,7 +19,7 @@ export default function Sidebar() {
   return (
     <aside className="w-60 shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
       <div className="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-800">
-        <span className="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100">Orders</span>
+        <Image src="/logo_gaderia.png" alt="Gaderia" width={120} height={32} className="object-contain" />
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map(({ href, label, icon }) => {

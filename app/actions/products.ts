@@ -8,6 +8,24 @@ async function getToken() {
   return cookieStore.get('token')?.value ?? '';
 }
 
+export async function createProduct(data: Record<string, unknown>) {
+  const res = await fetch('http://localhost:3000/catalog', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${await getToken()}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.message ?? 'Failed to create product');
+  }
+
+  revalidatePath('/dashboard/products');
+}
+
 export async function updateProduct(id: number, data: Record<string, unknown>) {
   const res = await fetch(`http://localhost:3000/catalog/${id}`, {
     method: 'PATCH',
