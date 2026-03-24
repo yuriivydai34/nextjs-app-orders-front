@@ -84,12 +84,12 @@ export default async function ProductsPage(props: PageProps<'/dashboard/products
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-800">
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 w-12"></th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Name</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Article</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Price</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Volume</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Type</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Packaging</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Назва</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Артикул</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Ціна</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Об'єм</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Тип</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Упаковка</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -149,7 +149,7 @@ export default async function ProductsPage(props: PageProps<'/dashboard/products
                 {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}
               </p>
               <div className="flex items-center gap-1">
-                <PaginationLink href={`?page=${page - 1}`} disabled={page <= 1}>← Prev</PaginationLink>
+                <PaginationLink href={`?page=${page - 1}`} disabled={page <= 1}>← Назад</PaginationLink>
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                   .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
                   .reduce<(number | 'ellipsis')[]>((acc, p, idx, arr) => {
@@ -164,7 +164,7 @@ export default async function ProductsPage(props: PageProps<'/dashboard/products
                       <PaginationLink key={p} href={`?page=${p}`} active={p === page}>{p}</PaginationLink>
                     )
                   )}
-                <PaginationLink href={`?page=${page + 1}`} disabled={page >= totalPages}>Next →</PaginationLink>
+                <PaginationLink href={`?page=${page + 1}`} disabled={page >= totalPages}>Далі →</PaginationLink>
               </div>
             </div>
           )}

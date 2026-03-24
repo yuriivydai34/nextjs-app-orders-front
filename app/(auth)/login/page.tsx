@@ -10,12 +10,12 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-sm">
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-8 shadow-sm">
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Sign in</h1>
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Вхід</h1>
 
         <form action={action} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email
+              Електронна пошта
             </label>
             <input
               id="email"
@@ -29,7 +29,7 @@ export default function LoginPage() {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Password
+              Пароль
             </label>
             <input
               id="password"
@@ -50,14 +50,14 @@ export default function LoginPage() {
             disabled={pending}
             className="w-full py-2 px-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-sm font-medium rounded-lg hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors disabled:opacity-50"
           >
-            {pending ? 'Signing in…' : 'Sign in'}
+            {pending ? 'Вхід…' : 'Увійти'}
           </button>
         </form>
 
         <p className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center">
-          No account?{' '}
+          Немає акаунту?{' '}
           <Link href="/register" className="text-gray-900 dark:text-gray-100 font-medium hover:underline">
-            Register
+            Реєстрація
           </Link>
         </p>
       </div>

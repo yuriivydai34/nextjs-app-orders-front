@@ -41,7 +41,7 @@ export default function OrderProductsModal({
         onClick={() => dialogRef.current?.showModal()}
         className="px-2.5 py-1 rounded-md text-xs font-medium text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
       >
-        Products ({items.length})
+        Товари ({items.length})
       </button>
 
       <dialog
@@ -51,7 +51,7 @@ export default function OrderProductsModal({
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-            Order #{orderId} — Products
+            Замовлення #{orderId} — Товари
           </h3>
           <button
             onClick={() => dialogRef.current?.close()}
@@ -96,8 +96,8 @@ export default function OrderProductsModal({
         </div>
 
         <div className="flex items-center justify-between px-5 py-3 border-t border-gray-200 dark:border-gray-700">
-          <span className="text-xs text-gray-500 dark:text-gray-400">{items.length} item{items.length !== 1 ? 's' : ''}</span>
-          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">Total: {total} ₴</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{items.length} поз.</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">Разом: {total} ₴</span>
         </div>
       </dialog>
     </>

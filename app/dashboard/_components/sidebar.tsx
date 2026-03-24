@@ -6,11 +6,11 @@ import { usePathname } from 'next/navigation';
 import { logout } from '@/app/actions/auth';
 
 const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: '▦' },
-  { href: '/dashboard/orders', label: 'Orders', icon: '📋' },
-  { href: '/dashboard/customers', label: 'Customers', icon: '👥' },
-  { href: '/dashboard/products', label: 'Products', icon: '📦' },
-  { href: '/dashboard/settings', label: 'Settings', icon: '⚙' },
+  { href: '/dashboard', label: 'Огляд', icon: '▦' },
+  { href: '/dashboard/orders', label: 'Замовлення', icon: '📋' },
+  { href: '/dashboard/customers', label: 'Клієнти', icon: '👥' },
+  { href: '/dashboard/products', label: 'Товари', icon: '📦' },
+  { href: '/dashboard/settings', label: 'Налаштування', icon: '⚙' },
 ];
 
 export default function Sidebar() {
@@ -47,7 +47,7 @@ export default function Sidebar() {
             className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
           >
             <span className="text-base leading-none">↩</span>
-            Sign out
+            Вийти
           </button>
         </form>
       </div>

@@ -94,12 +94,12 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Orders</h2>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Замовлення</h2>
 
       {error ? (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       ) : payments.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">No orders found.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Замовлень не знайдено.</p>
       ) : (
         <>
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
@@ -107,12 +107,12 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-800">
                   <th className="text-left px-4 py-3"><SortableHeader column="id" label="ID" /></th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Order ID</th>
-                  <th className="text-left px-4 py-3"><SortableHeader column="amount" label="Amount" /></th>
-                  <th className="text-left px-4 py-3"><SortableHeader column="status" label="Status" /></th>
-                  <th className="text-left px-4 py-3"><SortableHeader column="createdAt" label="Created" /></th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Check</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Items</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">№ замовлення</th>
+                  <th className="text-left px-4 py-3"><SortableHeader column="amount" label="Сума" /></th>
+                  <th className="text-left px-4 py-3"><SortableHeader column="status" label="Статус" /></th>
+                  <th className="text-left px-4 py-3"><SortableHeader column="createdAt" label="Створено" /></th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Чек</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Товари</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -141,7 +141,7 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                           rel="noopener noreferrer"
                           className="text-blue-600 dark:text-blue-400 hover:underline text-xs"
                         >
-                          View
+                          Переглянути
                         </a>
                       ) : (
                         <span className="text-gray-300 dark:text-gray-600">—</span>
@@ -166,7 +166,7 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
               {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}
             </p>
             <div className="flex items-center gap-1">
-              <PaginationLink href={`?page=${page - 1}&sortBy=${sort}&sortOrder=${order}`} disabled={page <= 1}>← Prev</PaginationLink>
+              <PaginationLink href={`?page=${page - 1}&sortBy=${sort}&sortOrder=${order}`} disabled={page <= 1}>← Назад</PaginationLink>
               {Array.from({ length: totalPages }, (_, i) => i + 1)
                 .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
                 .reduce<(number | 'ellipsis')[]>((acc, p, idx, arr) => {
@@ -181,7 +181,7 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                     <PaginationLink key={p} href={`?page=${p}&sortBy=${sort}&sortOrder=${order}`} active={p === page}>{p}</PaginationLink>
                   )
                 )}
-              <PaginationLink href={`?page=${page + 1}&sortBy=${sort}&sortOrder=${order}`} disabled={page >= totalPages}>Next →</PaginationLink>
+              <PaginationLink href={`?page=${page + 1}&sortBy=${sort}&sortOrder=${order}`} disabled={page >= totalPages}>Далі →</PaginationLink>
             </div>
           </div>
         </>

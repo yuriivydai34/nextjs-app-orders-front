@@ -48,12 +48,13 @@ export default async function CustomersPage(props: PageProps<'/dashboard/custome
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Customers</h2>
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Клієнти</h2>
 
       {error ? (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+
       ) : customers.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">No customers found.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Клієнтів не знайдено.</p>
       ) : (
         <>
           <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
@@ -61,7 +62,7 @@ export default async function CustomersPage(props: PageProps<'/dashboard/custome
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-800">
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">ID</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Name</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Ім'я</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Email</th>
                 </tr>
               </thead>
@@ -83,7 +84,7 @@ export default async function CustomersPage(props: PageProps<'/dashboard/custome
             </p>
             <div className="flex items-center gap-1">
               <PaginationLink href={`?page=${page - 1}`} disabled={page <= 1}>
-                ← Prev
+                ← Назад
               </PaginationLink>
               {Array.from({ length: totalPages }, (_, i) => i + 1)
                 .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
@@ -102,7 +103,7 @@ export default async function CustomersPage(props: PageProps<'/dashboard/custome
                   )
                 )}
               <PaginationLink href={`?page=${page + 1}`} disabled={page >= totalPages}>
-                Next →
+                Далі →
               </PaginationLink>
             </div>
           </div>
