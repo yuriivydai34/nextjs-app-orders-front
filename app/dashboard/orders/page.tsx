@@ -58,18 +58,25 @@ async function getPayments(
   return res.json();
 }
 
+const statusLabels: Record<string, string> = {
+  WAITING:   'Очікує',
+  WORK:      'В роботі',
+  CANCELED:  'Скасовано',
+  COMPLETED: 'Виконано',
+};
+
 const statusStyles: Record<string, string> = {
-  PAID:       'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  CANCELED:   'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  PENDING:    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-  PROCESSING: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  WAITING:   'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+  WORK:      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  CANCELED:  'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  COMPLETED: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
 };
 
 function StatusBadge({ status }: { status: string }) {
   const cls = statusStyles[status] ?? 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
   return (
     <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-medium ${cls}`}>
-      {status}
+      {statusLabels[status] ?? status}
     </span>
   );
 }

@@ -2,13 +2,20 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
-const STATUSES = ['PAID', 'CANCELED', 'PENDING', 'PROCESSING'] as const;
+const STATUSES = ['WAITING', 'WORK', 'CANCELED', 'COMPLETED'] as const;
+
+const statusLabels: Record<string, string> = {
+  WAITING:   'Очікує',
+  WORK:      'В роботі',
+  CANCELED:  'Скасовано',
+  COMPLETED: 'Виконано',
+};
 
 const activeStyles: Record<string, string> = {
-  PAID:       'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  CANCELED:   'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  PENDING:    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-  PROCESSING: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  WAITING:   'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+  WORK:      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  CANCELED:  'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  COMPLETED: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
 };
 
 export default function StatusFilter() {
@@ -43,7 +50,7 @@ export default function StatusFilter() {
                 : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
-            {s}
+            {statusLabels[s]}
           </button>
         );
       })}
