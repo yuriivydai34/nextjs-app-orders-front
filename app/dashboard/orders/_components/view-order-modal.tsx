@@ -85,7 +85,7 @@ export default function ViewOrderModal(props: Props) {
           </Row>
 
           <Row label="Сума">
-            <span className="font-medium text-gray-900 dark:text-gray-100">{amount.toLocaleString()} {currency}</span>
+            <span className="font-medium text-gray-900 dark:text-gray-100">{amount.toLocaleString('uk-UA')} {currency}</span>
           </Row>
 
           <Row label="Статус">
