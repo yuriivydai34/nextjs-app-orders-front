@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import EditOrderModal from './_components/edit-order-modal';
 import OrderProductsModal from './_components/order-products-modal';
+import ViewOrderModal from './_components/view-order-modal';
 import SortableHeader from './_components/sortable-header';
 import ExportButton from './_components/export-button';
 import StatusFilter from './_components/status-filter';
@@ -172,7 +173,21 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <EditOrderModal id={p.id} ttn={p.ttn ?? ''} status={p.status} />
+                      <div className="flex items-center gap-2">
+                        <ViewOrderModal
+                          id={p.id}
+                          order_id={p.order_id}
+                          amount={p.amount}
+                          currency={p.currency}
+                          status={p.status}
+                          ttn={p.ttn ?? ''}
+                          createdAt={p.createdAt}
+                          updatedAt={p.updatedAt}
+                          cashier_check={p.cashier_check}
+                          catalog_list_id={p.catalog_list_id}
+                        />
+                        <EditOrderModal id={p.id} ttn={p.ttn ?? ''} status={p.status} />
+                      </div>
                     </td>
                   </tr>
                 ))}
