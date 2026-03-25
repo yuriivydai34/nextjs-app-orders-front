@@ -1,7 +1,6 @@
 @import "tailwindcss";
+@config "../tailwind.config.js";
 @import "@heroui/styles";
-
-@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #ffffff;
