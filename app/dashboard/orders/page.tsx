@@ -17,6 +17,13 @@ type Payment = {
   createdAt: number;
   updatedAt: string;
   cashier_check: { id?: string; message?: string } | null;
+  user_name?: string | null;
+  user_email?: string | null;
+  user_phone?: string | null;
+  delivery_type?: string | null;
+  delivery_address?: string | null;
+  payment_method?: string | null;
+  delivery_payment?: number | null;
   catalog_list_id: {
     id: number;
     count: number;
@@ -126,51 +133,58 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-800">
-                  <th className="text-left px-4 py-3"><SortableHeader column="id" label="ID" /></th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">№ замовлення</th>
-                  <th className="text-left px-4 py-3"><SortableHeader column="amount" label="Сума" /></th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Користувач</th>
                   <th className="text-left px-4 py-3"><SortableHeader column="status" label="Статус" /></th>
-                  <th className="text-left px-4 py-3"><SortableHeader column="createdAt" label="Створено" /></th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Чек</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Товари</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Доставка</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">ТТН</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Метод оплати</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Вартість доставки</th>
+                  <th className="text-left px-4 py-3"><SortableHeader column="amount" label="Вартість" /></th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">ID замовлення</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
               <tbody>
                 {payments.map((p) => (
                   <tr key={p.id} className="border-b last:border-0 border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{p.id}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-gray-600 dark:text-gray-300">{p.order_id}</td>
-                    <td className="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">
-                      {p.amount.toLocaleString()} {p.currency}
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-0.5">
+                        {p.user_name && <span className="text-sm text-gray-900 dark:text-gray-100">{p.user_name}</span>}
+                        {p.user_email && <span className="text-xs text-gray-500 dark:text-gray-400">{p.user_email}</span>}
+                        {p.user_phone && <span className="text-xs text-gray-500 dark:text-gray-400">{p.user_phone}</span>}
+                        {!p.user_name && !p.user_email && !p.user_phone && <span className="text-gray-300 dark:text-gray-600">—</span>}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={p.status} />
-                    </td>
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                      {new Date(p.createdAt * 1000).toLocaleString('en-GB', {
-                        day: '2-digit', month: 'short', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit',
-                      })}
-                    </td>
-                    <td className="px-4 py-3">
-                      {p.cashier_check?.id ? (
-                        <a
-                          href={`https://check.checkbox.ua/${p.cashier_check.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 dark:text-blue-400 hover:underline text-xs"
-                        >
-                          Переглянути
-                        </a>
-                      ) : (
-                        <span className="text-gray-300 dark:text-gray-600">—</span>
-                      )}
                     </td>
                     <td className="px-4 py-3">
                       {p.catalog_list_id?.length > 0 && (
                         <OrderProductsModal orderId={p.id} items={p.catalog_list_id} />
                       )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-0.5" style={{ maxWidth: 150, minWidth: 150 }}>
+                        {p.delivery_type && <span className="text-sm text-gray-900 dark:text-gray-100">{p.delivery_type}</span>}
+                        {p.delivery_address && <span className="text-xs text-gray-500 dark:text-gray-400">{p.delivery_address}</span>}
+                        {!p.delivery_type && !p.delivery_address && <span className="text-gray-300 dark:text-gray-600">—</span>}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-700 dark:text-gray-300" style={{ maxWidth: 150, minWidth: 150 }}>
+                      {p.ttn ?? <span className="text-gray-300 dark:text-gray-600">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300" style={{ maxWidth: 150, minWidth: 150 }}>
+                      {p.payment_method ?? <span className="text-gray-300 dark:text-gray-600">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300" style={{ maxWidth: 100, minWidth: 100 }}>
+                      {p.delivery_payment != null ? `${p.delivery_payment} грн` : <span className="text-gray-300 dark:text-gray-600">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium" style={{ maxWidth: 100, minWidth: 100 }}>
+                      {p.amount.toLocaleString()} {p.currency}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs text-gray-600 dark:text-gray-300" style={{ maxWidth: 300, minWidth: 300 }}>
+                      {p.order_id}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
