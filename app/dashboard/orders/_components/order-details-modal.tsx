@@ -97,7 +97,8 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 export default function OrderDetailsModal({ payment }: { payment: Payment }) {
   const ref = useRef<HTMLDialogElement>(null);
 
-  const createdDate = new Date(payment.createdAt).toLocaleString('uk-UA', {
+  const createdTs = payment.createdAt < 1e10 ? payment.createdAt * 1000 : payment.createdAt;
+  const createdDate = new Date(createdTs).toLocaleString('uk-UA', {
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit',
   });

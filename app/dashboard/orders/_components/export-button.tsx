@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 
-export default function ExportButton({ token }: { token: string }) {
+export default function ExportButton({ token, initialDate }: { token: string; initialDate?: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(initialDate ?? '');
 
   async function handleExport() {
     setLoading(true);
