@@ -17,13 +17,17 @@ type Payment = {
   createdAt: number;
   updatedAt: string;
   cashier_check: { id?: string; message?: string } | null;
-  user_name?: string | null;
-  user_email?: string | null;
-  user_phone?: string | null;
-  delivery_type?: string | null;
-  delivery_address?: string | null;
+  full_name?: string | null;
+  email?: string | null;
+  number?: string | null;
+  comment?: string | null;
   payment_method?: string | null;
+  url_payment?: string | null;
+  type_delivery?: string | null;
+  delivery_description?: Record<string, unknown> | null;
+  delivery_address?: string | null;
   delivery_payment?: number | null;
+  is_delivery_payment?: boolean;
   catalog_list_id: {
     id: number;
     count: number;
@@ -36,7 +40,12 @@ type Payment = {
       measurement: number;
       type_measurement: string | null;
       type_packaging: string | null;
+      type_juice: string | null;
       picture: string | null;
+      shipment_weight: number | null;
+      shipment_length: number | null;
+      shipment_width: number | null;
+      shipment_height: number | null;
     };
   }[];
 };
@@ -79,6 +88,34 @@ const statusStyles: Record<string, string> = {
   CANCELED:  'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
   COMPLETED: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
 };
+
+const DELIVERY_LABELS: Record<string, string> = {
+  MAIL:    'Нова Пошта',
+  UKRMAIL: 'Укрпошта',
+};
+
+function getDeliveryAddress(type: string | null | undefined, desc: Record<string, unknown> | null | undefined): string | null {
+  if (!desc) return null;
+  if (type === 'MAIL') return (desc.ShortAddress as string) ?? null;
+  if (type === 'UKRMAIL') {
+    const city = desc.CITY_UA as string;
+    const addr = desc.ADDRESS as string;
+    return [city, addr].filter(Boolean).join(', ') || null;
+  }
+  return null;
+}
+
+function DeliveryCell({ type, desc }: { type?: string | null; desc?: Record<string, unknown> | null }) {
+  const label = type ? (DELIVERY_LABELS[type] ?? type) : null;
+  const address = getDeliveryAddress(type, desc);
+  if (!label && !address) return <span className="text-gray-300 dark:text-gray-600">—</span>;
+  return (
+    <div className="flex flex-col gap-0.5" style={{ maxWidth: 180, minWidth: 150 }}>
+      {label && <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{label}</span>}
+      {address && <span className="text-xs text-gray-500 dark:text-gray-400">{address}</span>}
+    </div>
+  );
+}
 
 function StatusBadge({ status }: { status: string }) {
   const cls = statusStyles[status] ?? 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
@@ -150,10 +187,10 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                   <tr key={p.id} className="border-b last:border-0 border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
                     <td className="px-4 py-3">
                       <div className="flex flex-col gap-0.5">
-                        {p.user_name && <span className="text-sm text-gray-900 dark:text-gray-100">{p.user_name}</span>}
-                        {p.user_email && <span className="text-xs text-gray-500 dark:text-gray-400">{p.user_email}</span>}
-                        {p.user_phone && <span className="text-xs text-gray-500 dark:text-gray-400">{p.user_phone}</span>}
-                        {!p.user_name && !p.user_email && !p.user_phone && <span className="text-gray-300 dark:text-gray-600">—</span>}
+                        {p.full_name && <span className="text-sm text-gray-900 dark:text-gray-100">{p.full_name}</span>}
+                        {p.email && <span className="text-xs text-gray-500 dark:text-gray-400">{p.email}</span>}
+                        {p.number && <span className="text-xs text-gray-500 dark:text-gray-400">{p.number}</span>}
+                        {!p.full_name && !p.email && !p.number && <span className="text-gray-300 dark:text-gray-600">—</span>}
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -165,11 +202,7 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex flex-col gap-0.5" style={{ maxWidth: 150, minWidth: 150 }}>
-                        {p.delivery_type && <span className="text-sm text-gray-900 dark:text-gray-100">{p.delivery_type}</span>}
-                        {p.delivery_address && <span className="text-xs text-gray-500 dark:text-gray-400">{p.delivery_address}</span>}
-                        {!p.delivery_type && !p.delivery_address && <span className="text-gray-300 dark:text-gray-600">—</span>}
-                      </div>
+                      <DeliveryCell type={p.type_delivery} desc={p.delivery_description} />
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-700 dark:text-gray-300" style={{ maxWidth: 150, minWidth: 150 }}>
                       {p.ttn ?? <span className="text-gray-300 dark:text-gray-600">—</span>}

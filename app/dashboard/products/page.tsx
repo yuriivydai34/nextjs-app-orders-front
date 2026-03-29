@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import Image from 'next/image';
 import ProductActions from './_components/product-actions';
 import AddProductModal from './_components/add-product-modal';
 
@@ -12,14 +11,12 @@ type Product = {
   is_discount: boolean;
   type_product: string | null;
   type_packaging: string | null;
+  type_juice: string | null;
   measurement: number;
   type_measurement: string | null;
   article: string | null;
   picture: string | null;
   description?: string | null;
-  type_juice?: string | null;
-  type_apple?: string | null;
-  type_vinegar?: string | null;
   shipment_weight?: number | null;
   shipment_length?: number | null;
   shipment_width?: number | null;
@@ -31,6 +28,14 @@ type ProductsResponse = {
   total: number;
   page: number;
   limit: number;
+};
+
+const JUICE_LABELS: Record<string, string> = {
+  APPLE:          'Яблучний сік',
+  APPLEGRAPE:     'Виноградно-яблучний сік',
+  CARROTAPPLE:    'Морквяно-яблучний сік',
+  PEARAPPLE:      'Грушево-яблучний сік',
+  STRAWBERRYAPPLE:'Полунично-яблучний сік',
 };
 
 async function getProducts(token: string, page: number): Promise<ProductsResponse> {
@@ -55,7 +60,7 @@ export default async function ProductsPage(props: PageProps<'/dashboard/products
   try {
     result = await getProducts(token, page);
   } catch {
-    error = 'Could not load products.';
+    error = 'Не вдалося завантажити товари.';
   }
 
   const products = result?.data ?? [];
@@ -63,11 +68,13 @@ export default async function ProductsPage(props: PageProps<'/dashboard/products
   const limit = result?.limit ?? 20;
   const totalPages = Math.ceil(total / limit);
 
+  const COLS = ['Картинка', 'Назва', 'Довжина', 'Ширина', 'Висота', 'Вага', 'Ціна', 'Тип соку', ''];
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Products
+          Товари
           {total > 0 && <span className="ml-2 text-sm font-normal text-gray-400">{total}</span>}
         </h2>
         <AddProductModal />
@@ -76,65 +83,73 @@ export default async function ProductsPage(props: PageProps<'/dashboard/products
       {error ? (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       ) : products.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">No products found.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Товарів не знайдено.</p>
       ) : (
         <>
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="p-4 bg-white dark:bg-gray-900 rounded-xl shadow-sm overflow-x-auto">
+            <table className="min-w-full w-full table-auto">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-800">
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400 w-12"></th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Назва</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Артикул</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Ціна</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Об'єм</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Тип</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Упаковка</th>
-                  <th className="px-4 py-3" />
+                <tr>
+                  {COLS.map((col, i) => (
+                    <th
+                      key={i}
+                      className={`px-3 h-10 text-left align-middle bg-gray-100 dark:bg-gray-800 whitespace-nowrap text-xs font-semibold text-gray-500 dark:text-gray-400
+                        ${i === 0 ? 'rounded-l-lg' : ''}
+                        ${i === COLS.length - 1 ? 'rounded-r-lg' : ''}
+                      `}
+                    >
+                      {col}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {products.map((p) => (
-                  <tr key={p.id} className="border-b last:border-0 border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="px-4 py-2">
-                      {p.picture ? (
-                        <Image
-                          src={p.picture}
-                          alt={p.header}
-                          width={36}
-                          height={36}
-                          className="rounded object-contain bg-gray-50 dark:bg-gray-800"
-                        />
-                      ) : (
-                        <div className="w-9 h-9 rounded bg-gray-100 dark:bg-gray-800" />
-                      )}
+                  <tr key={p.id} className="group hover:bg-gray-50 dark:hover:bg-gray-800/40">
+                    <td className="py-2 px-3 align-middle">
+                      <div style={{ maxWidth: 120, minWidth: 120 }}>
+                        {p.picture ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={p.picture}
+                            alt={p.header}
+                            width={120}
+                            height={120}
+                            style={{ objectFit: 'contain', width: 120, height: 120 }}
+                            className="rounded-xl bg-gray-50 dark:bg-gray-800"
+                          />
+                        ) : (
+                          <div className="w-[120px] h-[120px] rounded-xl bg-gray-100 dark:bg-gray-800" />
+                        )}
+                      </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-900 dark:text-gray-100 max-w-xs">
-                      <p className="truncate">{p.header}</p>
+                    <td className="py-2 px-3 align-middle text-sm text-gray-900 dark:text-gray-100">
+                      <div className="line-clamp-1 max-w-[200px]">{p.header}</div>
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-gray-500 dark:text-gray-400">
-                      {p.article ?? '—'}
+                    <td className="py-2 px-3 align-middle text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                      {p.shipment_length ?? '—'} см
                     </td>
-                    <td className="px-4 py-3 text-gray-900 dark:text-gray-100 whitespace-nowrap">
+                    <td className="py-2 px-3 align-middle text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                      {p.shipment_width ?? '—'} см
+                    </td>
+                    <td className="py-2 px-3 align-middle text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                      {p.shipment_height ?? '—'} см
+                    </td>
+                    <td className="py-2 px-3 align-middle text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                      {p.shipment_weight ?? '—'} кг
+                    </td>
+                    <td className="py-2 px-3 align-middle text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">
                       {p.is_discount && p.price_discount > 0 ? (
                         <span className="flex flex-col">
-                          <span>{p.price_discount} ₴</span>
-                          <span className="line-through text-xs text-gray-400">{p.price} ₴</span>
+                          <span>{p.price_discount}</span>
+                          <span className="line-through text-xs text-gray-400">{p.price}</span>
                         </span>
-                      ) : (
-                        `${p.price} ₴`
-                      )}
+                      ) : p.price}
                     </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                      {p.measurement} {p.type_measurement?.toLowerCase() ?? ''}
+                    <td className="py-2 px-3 align-middle text-sm text-gray-700 dark:text-gray-300">
+                      {p.type_juice ? (JUICE_LABELS[p.type_juice] ?? p.type_juice) : '—'}
                     </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
-                      {p.type_product ?? '—'}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
-                      {p.type_packaging ?? '—'}
-                    </td>
-                    <td className="px-4 py-3">
+                    <td className="py-2 px-3 align-middle">
                       <ProductActions product={p} />
                     </td>
                   </tr>
@@ -146,7 +161,7 @@ export default async function ProductsPage(props: PageProps<'/dashboard/products
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}
+                {(page - 1) * limit + 1}–{Math.min(page * limit, total)} з {total}
               </p>
               <div className="flex items-center gap-1">
                 <PaginationLink href={`?page=${page - 1}`} disabled={page <= 1}>← Назад</PaginationLink>
@@ -174,14 +189,7 @@ export default async function ProductsPage(props: PageProps<'/dashboard/products
   );
 }
 
-function PaginationLink({
-  href, children, active, disabled,
-}: {
-  href: string;
-  children: React.ReactNode;
-  active?: boolean;
-  disabled?: boolean;
-}) {
+function PaginationLink({ href, children, active, disabled }: { href: string; children: React.ReactNode; active?: boolean; disabled?: boolean }) {
   const base = 'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors';
   if (disabled) return <span className={`${base} text-gray-300 dark:text-gray-600 cursor-not-allowed`}>{children}</span>;
   if (active) return <span className={`${base} bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900`}>{children}</span>;
