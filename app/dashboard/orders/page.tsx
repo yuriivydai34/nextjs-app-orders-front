@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import EditOrderModal from './_components/edit-order-modal';
+import OrderDetailsModal from './_components/order-details-modal';
 import OrderProductsModal from './_components/order-products-modal';
 import SortableHeader from './_components/sortable-header';
 import StatusFilter from './_components/status-filter';
@@ -218,6 +219,7 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-4">
+                        <OrderDetailsModal payment={p} />
                         <EditOrderModal id={p.id} ttn={p.ttn ?? ''} status={p.status} />
                       </div>
                     </td>
