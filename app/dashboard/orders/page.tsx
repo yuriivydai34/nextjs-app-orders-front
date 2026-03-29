@@ -2,7 +2,6 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import EditOrderModal from './_components/edit-order-modal';
 import OrderProductsModal from './_components/order-products-modal';
-import ViewOrderModal from './_components/view-order-modal';
 import SortableHeader from './_components/sortable-header';
 import ExportButton from './_components/export-button';
 import StatusFilter from './_components/status-filter';
@@ -76,8 +75,8 @@ async function getPayments(
 }
 
 const statusLabels: Record<string, string> = {
-  WAITING:   'Очікує',
-  WORK:      'В роботі',
+  WAITING:   'Очікування',
+  WORK:      'Оплачено',
   CANCELED:  'Скасовано',
   COMPLETED: 'Виконано',
 };
@@ -166,7 +165,7 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
         <p className="text-sm text-gray-500 dark:text-gray-400">Замовлень не знайдено.</p>
       ) : (
         <>
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-800">
@@ -220,19 +219,7 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
                       {p.order_id}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <ViewOrderModal
-                          id={p.id}
-                          order_id={p.order_id}
-                          amount={p.amount}
-                          currency={p.currency}
-                          status={p.status}
-                          ttn={p.ttn ?? ''}
-                          createdAt={p.createdAt}
-                          updatedAt={p.updatedAt}
-                          cashier_check={p.cashier_check}
-                          catalog_list_id={p.catalog_list_id}
-                        />
+                      <div className="flex items-center gap-4">
                         <EditOrderModal id={p.id} ttn={p.ttn ?? ''} status={p.status} />
                       </div>
                     </td>

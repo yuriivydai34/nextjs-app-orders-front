@@ -6,8 +6,8 @@ import { useState, useRef, useEffect } from 'react';
 const STATUSES = ['WAITING', 'WORK', 'CANCELED', 'COMPLETED'] as const;
 
 const statusLabels: Record<string, string> = {
-  WAITING:   'Очікує',
-  WORK:      'В роботі',
+  WAITING:   'Очікування',
+  WORK:      'Оплачено',
   CANCELED:  'Скасовано',
   COMPLETED: 'Виконано',
 };
