@@ -1,18 +1,12 @@
-'use server';
-
-import { cookies } from 'next/headers';
-import { revalidatePath } from 'next/cache';
-
-async function getToken() {
-  const cookieStore = await cookies();
-  return cookieStore.get('token')?.value ?? '';
+function getToken() {
+  return localStorage.getItem('token') ?? '';
 }
 
 export async function createProduct(data: Record<string, unknown>) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${await getToken()}`,
+      Authorization: `Bearer ${getToken()}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
@@ -22,15 +16,13 @@ export async function createProduct(data: Record<string, unknown>) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err?.message ?? 'Failed to create product');
   }
-
-  revalidatePath('/dashboard/products');
 }
 
 export async function updateProduct(id: number, data: Record<string, unknown>) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog/${id}`, {
     method: 'PATCH',
     headers: {
-      Authorization: `Bearer ${await getToken()}`,
+      Authorization: `Bearer ${getToken()}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
@@ -40,20 +32,16 @@ export async function updateProduct(id: number, data: Record<string, unknown>) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err?.message ?? 'Failed to update product');
   }
-
-  revalidatePath('/dashboard/products');
 }
 
 export async function deleteProduct(id: number) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog/${id}`, {
     method: 'DELETE',
-    headers: { Authorization: `Bearer ${await getToken()}` },
+    headers: { Authorization: `Bearer ${getToken()}` },
   });
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err?.message ?? 'Failed to delete product');
   }
-
-  revalidatePath('/dashboard/products');
 }

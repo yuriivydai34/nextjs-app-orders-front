@@ -49,6 +49,7 @@ export default function CustomerActions({ customer }: { customer: Customer }) {
       try {
         await updateCustomer(customer.id, data);
         editRef.current?.close();
+        window.location.reload();
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Помилка збереження');
       }

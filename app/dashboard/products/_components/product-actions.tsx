@@ -57,6 +57,7 @@ export default function ProductActions({ product }: { product: Product }) {
       try {
         await updateProduct(product.id, data);
         editRef.current?.close();
+        window.location.reload();
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Помилка збереження');
       }
@@ -68,6 +69,7 @@ export default function ProductActions({ product }: { product: Product }) {
       try {
         await deleteProduct(product.id);
         deleteRef.current?.close();
+        window.location.reload();
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Помилка видалення');
       }

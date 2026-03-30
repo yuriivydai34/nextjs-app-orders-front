@@ -1,14 +1,6 @@
-'use server';
-
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-
 export type AuthState = { error?: string } | undefined;
 
-export async function login(state: AuthState, formData: FormData): Promise<AuthState> {
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
-
+export async function login(email: string, password: string): Promise<AuthState> {
   let res: Response;
   try {
     res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
@@ -26,22 +18,11 @@ export async function login(state: AuthState, formData: FormData): Promise<AuthS
 
   const data = await res.json();
   const token: string = data.token ?? data.access_token;
-
-  const cookieStore = await cookies();
-  cookieStore.set('token', token, {
-    httpOnly: true,
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-  });
-
-  redirect('/dashboard');
+  localStorage.setItem('token', token);
+  window.location.href = '/dashboard';
 }
 
-export async function register(state: AuthState, formData: FormData): Promise<AuthState> {
-  const name = formData.get('name') as string;
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
-
+export async function register(name: string, email: string, password: string): Promise<AuthState> {
   let res: Response;
   try {
     res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
@@ -58,11 +39,10 @@ export async function register(state: AuthState, formData: FormData): Promise<Au
     return { error: data?.message ?? 'Registration failed.' };
   }
 
-  redirect('/login');
+  window.location.href = '/login';
 }
 
-export async function logout() {
-  const cookieStore = await cookies();
-  cookieStore.delete('token');
-  redirect('/login');
+export function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/login';
 }

@@ -46,6 +46,7 @@ export default function AddProductModal() {
       try {
         await createProduct(data);
         close();
+        window.location.reload();
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Something went wrong');
       }

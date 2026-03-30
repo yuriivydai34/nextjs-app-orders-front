@@ -1,18 +1,33 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { register } from '@/app/actions/auth';
 
 export default function RegisterPage() {
-  const [state, action, pending] = useActionState(register, undefined);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function handleSubmit(e: { preventDefault(): void; currentTarget: HTMLFormElement }) {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    setPending(true);
+    setError(null);
+    const result = await register(
+      form.get('name') as string,
+      form.get('email') as string,
+      form.get('password') as string,
+    );
+    if (result?.error) setError(result.error);
+    setPending(false);
+  }
 
   return (
     <div className="w-full max-w-sm">
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-8 shadow-sm">
         <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Реєстрація</h1>
 
-        <form action={action} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Ім'я
@@ -55,8 +70,8 @@ export default function RegisterPage() {
             />
           </div>
 
-          {state?.error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>
+          {error && (
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
           )}
 
           <button

@@ -1,4 +1,7 @@
-import { cookies } from 'next/headers';
+'use client';
+
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ProductActions from './_components/product-actions';
 import AddProductModal from './_components/add-product-modal';
@@ -38,37 +41,36 @@ const JUICE_LABELS: Record<string, string> = {
   STRAWBERRYAPPLE:'Полунично-яблучний сік',
 };
 
-async function getProducts(token: string, page: number): Promise<ProductsResponse> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?page=${page}&limit=20`, {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error('Failed to fetch products');
-  return res.json();
-}
+const COLS = ['Картинка', 'Назва', 'Довжина', 'Ширина', 'Висота', 'Вага', 'Ціна', 'Тип соку', ''];
 
-export default async function ProductsPage(props: PageProps<'/dashboard/products'>) {
-  const { page: pageParam } = await props.searchParams;
-  const page = Math.max(1, Number(pageParam) || 1);
+function ProductsContent() {
+  const searchParams = useSearchParams();
+  const page = Math.max(1, Number(searchParams.get('page')) || 1);
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value ?? '';
+  const [result, setResult] = useState<ProductsResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  let result: ProductsResponse | null = null;
-  let error: string | null = null;
-
-  try {
-    result = await getProducts(token, page);
-  } catch {
-    error = 'Не вдалося завантажити товари.';
-  }
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    const token = localStorage.getItem('token') ?? '';
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?page=${page}&limit=20`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch products');
+        return res.json();
+      })
+      .then((data) => setResult(data))
+      .catch(() => setError('Не вдалося завантажити товари.'))
+      .finally(() => setLoading(false));
+  }, [page]);
 
   const products = result?.data ?? [];
   const total = result?.total ?? 0;
   const limit = result?.limit ?? 20;
   const totalPages = Math.ceil(total / limit);
-
-  const COLS = ['Картинка', 'Назва', 'Довжина', 'Ширина', 'Висота', 'Вага', 'Ціна', 'Тип соку', ''];
 
   return (
     <div>
@@ -80,7 +82,9 @@ export default async function ProductsPage(props: PageProps<'/dashboard/products
         <AddProductModal />
       </div>
 
-      {error ? (
+      {loading ? (
+        <p className="text-sm text-gray-500 dark:text-gray-400">Завантаження…</p>
+      ) : error ? (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       ) : products.length === 0 ? (
         <p className="text-sm text-gray-500 dark:text-gray-400">Товарів не знайдено.</p>
@@ -186,6 +190,14 @@ export default async function ProductsPage(props: PageProps<'/dashboard/products
         </>
       )}
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<p className="text-sm text-gray-500 dark:text-gray-400">Завантаження…</p>}>
+      <ProductsContent />
+    </Suspense>
   );
 }
 

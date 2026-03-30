@@ -1,18 +1,29 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { login } from '@/app/actions/auth';
 
 export default function LoginPage() {
-  const [state, action, pending] = useActionState(login, undefined);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  async function handleSubmit(e: { preventDefault(): void; currentTarget: HTMLFormElement }) {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    setPending(true);
+    setError(null);
+    const result = await login(form.get('email') as string, form.get('password') as string);
+    if (result?.error) setError(result.error);
+    setPending(false);
+  }
 
   return (
     <div className="w-full max-w-sm">
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-8 shadow-sm">
         <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Вхід</h1>
 
-        <form action={action} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Електронна пошта
@@ -41,8 +52,8 @@ export default function LoginPage() {
             />
           </div>
 
-          {state?.error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>
+          {error && (
+            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
           )}
 
           <button

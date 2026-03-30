@@ -1,11 +1,5 @@
-'use server';
-
-import { cookies } from 'next/headers';
-import { revalidatePath } from 'next/cache';
-
 export async function updateOrder(id: number, data: { ttn?: string; status?: string }) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value ?? '';
+  const token = localStorage.getItem('token') ?? '';
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/${id}`, {
     method: 'PATCH',
@@ -20,6 +14,4 @@ export async function updateOrder(id: number, data: { ttn?: string; status?: str
     const err = await res.json().catch(() => ({}));
     throw new Error(err?.message ?? 'Failed to update order');
   }
-
-  revalidatePath('/dashboard/orders');
 }

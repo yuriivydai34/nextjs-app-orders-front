@@ -1,4 +1,7 @@
-import { cookies } from 'next/headers';
+'use client';
+
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import EditOrderModal from './_components/edit-order-modal';
 import OrderDetailsModal from './_components/order-details-modal';
@@ -56,24 +59,6 @@ type PaymentsResponse = {
   limit: number;
 };
 
-async function getPayments(
-  token: string,
-  page: number,
-  sortBy: string,
-  sortOrder: string,
-  status: string,
-): Promise<PaymentsResponse> {
-  const qs = new URLSearchParams({ page: String(page), limit: '20', sortBy, sortOrder });
-  if (status) qs.set('status', status);
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/payments?${qs.toString()}`,
-    { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' },
-  );
-
-  if (!res.ok) throw new Error('Failed to fetch payments');
-  return res.json();
-}
-
 const statusLabels: Record<string, string> = {
   WAITING:   'Очікування',
   WORK:      'Оплачено',
@@ -125,24 +110,34 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) {
-  const { page: pageParam, sortBy, sortOrder, status: statusParam } = await props.searchParams;
-  const page = Math.max(1, Number(pageParam) || 1);
-  const sort = typeof sortBy === 'string' ? sortBy : 'createdAt';
-  const order = sortOrder === 'ASC' ? 'ASC' : 'DESC';
-  const status = typeof statusParam === 'string' ? statusParam : '';
+function OrdersContent() {
+  const searchParams = useSearchParams();
+  const page = Math.max(1, Number(searchParams.get('page')) || 1);
+  const sort = searchParams.get('sortBy') ?? 'createdAt';
+  const order = searchParams.get('sortOrder') === 'ASC' ? 'ASC' : 'DESC';
+  const status = searchParams.get('status') ?? '';
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value ?? '';
+  const [result, setResult] = useState<PaymentsResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  let result: PaymentsResponse | null = null;
-  let error: string | null = null;
-
-  try {
-    result = await getPayments(token, page, sort, order, status);
-  } catch {
-    error = 'Could not load orders.';
-  }
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    const token = localStorage.getItem('token') ?? '';
+    const qs = new URLSearchParams({ page: String(page), limit: '20', sortBy: sort, sortOrder: order });
+    if (status) qs.set('status', status);
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments?${qs.toString()}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch payments');
+        return res.json();
+      })
+      .then((data) => setResult(data))
+      .catch(() => setError('Could not load orders.'))
+      .finally(() => setLoading(false));
+  }, [page, sort, order, status]);
 
   const payments = result?.data ?? [];
   const total = result?.total ?? 0;
@@ -158,7 +153,9 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
         <StatusFilter />
       </div>
 
-      {error ? (
+      {loading ? (
+        <p className="text-sm text-gray-500 dark:text-gray-400">Завантаження…</p>
+      ) : error ? (
         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
       ) : payments.length === 0 ? (
         <p className="text-sm text-gray-500 dark:text-gray-400">Замовлень не знайдено.</p>
@@ -255,6 +252,14 @@ export default async function OrdersPage(props: PageProps<'/dashboard/orders'>) 
         </>
       )}
     </div>
+  );
+}
+
+export default function OrdersPage() {
+  return (
+    <Suspense fallback={<p className="text-sm text-gray-500 dark:text-gray-400">Завантаження…</p>}>
+      <OrdersContent />
+    </Suspense>
   );
 }
 

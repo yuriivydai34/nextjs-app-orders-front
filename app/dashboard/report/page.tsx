@@ -1,5 +1,7 @@
-import { cookies } from 'next/headers';
-import { Suspense } from 'react';
+'use client';
+
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ExportButton from '../orders/_components/export-button';
 import ReportDatePicker from './_components/report-date-picker';
 
@@ -45,46 +47,48 @@ const DELIVERY_LABELS: Record<string, string> = {
   UKRMAIL: 'Укрпошта',
 };
 
-async function getPaymentsByDate(token: string, date: string): Promise<PaymentsResponse> {
-  const qs = new URLSearchParams({ page: '1', limit: '100', sortBy: 'createdAt', sortOrder: 'DESC', date });
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments?${qs}`, {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error('Failed to fetch');
-  return res.json();
-}
+function ReportContent() {
+  const searchParams = useSearchParams();
+  const date = searchParams.get('date') ?? '';
 
-export default async function ReportPage(props: PageProps<'/dashboard/report'>) {
-  const { date: dateParam } = await props.searchParams;
-  const date = typeof dateParam === 'string' ? dateParam : '';
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value ?? '';
-
-  let payments: Payment[] = [];
-  let total = 0;
-  let fetchError: string | null = null;
-
-  if (date) {
-    try {
-      const result = await getPaymentsByDate(token, date);
-      const all = result.data ?? [];
-      payments = all.filter((p) => {
-        // createdAt may be seconds or milliseconds
-        const ts = p.createdAt < 1e10 ? p.createdAt * 1000 : p.createdAt;
-        const d = new Date(ts);
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${y}-${m}-${day}` === date;
-      });
-      total = payments.length;
-    } catch {
-      fetchError = 'Не вдалося завантажити дані.';
+  useEffect(() => {
+    if (!date) {
+      setPayments([]);
+      setFetchError(null);
+      return;
     }
-  }
+    setLoading(true);
+    setFetchError(null);
+    const token = localStorage.getItem('token') ?? '';
+    const qs = new URLSearchParams({ page: '1', limit: '100', sortBy: 'createdAt', sortOrder: 'DESC', date });
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments?${qs}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json() as Promise<PaymentsResponse>;
+      })
+      .then((result) => {
+        const all = result.data ?? [];
+        const filtered = all.filter((p) => {
+          const ts = p.createdAt < 1e10 ? p.createdAt * 1000 : p.createdAt;
+          const d = new Date(ts);
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return `${y}-${m}-${day}` === date;
+        });
+        setPayments(filtered);
+      })
+      .catch(() => setFetchError('Не вдалося завантажити дані.'))
+      .finally(() => setLoading(false));
+  }, [date]);
 
+  const total = payments.length;
   const totalAmount = payments.reduce((sum, p) => sum + p.amount, 0);
 
   return (
@@ -93,20 +97,22 @@ export default async function ReportPage(props: PageProps<'/dashboard/report'>) 
 
       <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 mb-6">
         <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Оберіть дату звіту</p>
-        <Suspense>
-          <ReportDatePicker value={date} />
-        </Suspense>
+        <ReportDatePicker value={date} />
       </div>
 
       {!date && (
         <p className="text-sm text-gray-400 dark:text-gray-500">Оберіть дату, щоб переглянути дані звіту.</p>
       )}
 
+      {date && loading && (
+        <p className="text-sm text-gray-500 dark:text-gray-400">Завантаження…</p>
+      )}
+
       {date && fetchError && (
         <p className="text-sm text-red-600 dark:text-red-400">{fetchError}</p>
       )}
 
-      {date && !fetchError && (
+      {date && !loading && !fetchError && (
         <>
           {/* Summary */}
           <div className="flex gap-4 mb-5">
@@ -186,12 +192,20 @@ export default async function ReportPage(props: PageProps<'/dashboard/report'>) 
               </div>
 
               <div className="flex justify-end">
-                <ExportButton token={token} initialDate={date} />
+                <ExportButton initialDate={date} />
               </div>
             </>
           )}
         </>
       )}
     </div>
+  );
+}
+
+export default function ReportPage() {
+  return (
+    <Suspense fallback={<p className="text-sm text-gray-500 dark:text-gray-400">Завантаження…</p>}>
+      <ReportContent />
+    </Suspense>
   );
 }

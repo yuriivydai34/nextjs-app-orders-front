@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-export default function ExportButton({ token, initialDate }: { token: string; initialDate?: string }) {
+export default function ExportButton({ initialDate }: { initialDate?: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [date, setDate] = useState(initialDate ?? '');
@@ -14,6 +14,7 @@ export default function ExportButton({ token, initialDate }: { token: string; in
       const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/payments/report`);
       if (date) url.searchParams.set('date', date);
 
+      const token = localStorage.getItem('token') ?? '';
       const res = await fetch(url.toString(), {
         headers: { Authorization: `Bearer ${token}` },
       });

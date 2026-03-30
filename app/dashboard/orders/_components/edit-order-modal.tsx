@@ -42,6 +42,7 @@ export default function EditOrderModal({ id, ttn, status }: Props) {
       try {
         await updateOrder(id, data);
         close();
+        window.location.reload();
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Something went wrong');
       }

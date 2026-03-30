@@ -1,9 +1,19 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Sidebar from './_components/sidebar';
 import ThemeToggle from './_components/theme-toggle';
 
-export default function DashboardLayout({
-  children,
-}: LayoutProps<'/dashboard'>) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!localStorage.getItem('token')) {
+      router.replace('/login');
+    }
+  }, [router]);
+
   return (
     <div className="flex flex-1 min-h-0">
       <Sidebar />
