@@ -18,7 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="flex flex-1 min-h-0">
       <Sidebar />
       <div className="flex flex-col flex-1 min-w-0">
-        <header className="h-16 shrink-0 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-between px-6">
+        <header className="h-16 shrink-0 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center justify-between pl-14 pr-6 md:px-6">
           <h1 className="text-sm font-medium text-gray-500 dark:text-gray-400">Панель керування</h1>
           <ThemeToggle />
         </header>
