@@ -66,6 +66,11 @@ const DELIVERY_LABELS: Record<string, string> = {
   UKRMAIL: 'Укрпошта',
 };
 
+const WAREHOUSE_CATEGORY_LABELS: Record<string, string> = {
+  Branch:   'Відділення',
+  Postomat: 'Поштомат',
+};
+
 const JUICE_LABELS: Record<string, string> = {
   APPLE:           'Яблучний',
   APPLEGRAPE:      'Виноградно-яблучний',
@@ -171,7 +176,18 @@ export default function OrderDetailsModal({ payment }: { payment: Payment }) {
             {payment.type_delivery && (
               <Row label="Тип доставки">{DELIVERY_LABELS[payment.type_delivery] ?? payment.type_delivery}</Row>
             )}
+            {!!payment.delivery_description?.CategoryOfWarehouse && (
+              <Row label="Тип відділення">
+                {WAREHOUSE_CATEGORY_LABELS[String(payment.delivery_description.CategoryOfWarehouse)] ?? String(payment.delivery_description.CategoryOfWarehouse)}
+              </Row>
+            )}
+            {!!payment.delivery_description?.Number && (
+              <Row label="Номер відділення">№{String(payment.delivery_description.Number)}</Row>
+            )}
             {deliveryAddress && <Row label="Адреса">{deliveryAddress}</Row>}
+            {!!payment.delivery_description?.PostalCodeUA && (
+              <Row label="Поштовий індекс">{String(payment.delivery_description.PostalCodeUA)}</Row>
+            )}
             {payment.delivery_address && <Row label="Адреса (введена)">{payment.delivery_address}</Row>}
             {payment.ttn && <Row label="ТТН">{payment.ttn}</Row>}
             {payment.delivery_payment != null && (

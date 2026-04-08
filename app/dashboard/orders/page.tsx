@@ -78,9 +78,14 @@ const DELIVERY_LABELS: Record<string, string> = {
   UKRMAIL: 'Укрпошта',
 };
 
+const WAREHOUSE_CATEGORY_LABELS: Record<string, string> = {
+  Branch:   'Відділення',
+  Postomat: 'Поштомат',
+};
+
 function getDeliveryAddress(type: string | null | undefined, desc: Record<string, unknown> | null | undefined): string | null {
   if (!desc) return null;
-  if (type === 'MAIL') return (desc.ShortAddress as string) ?? null;
+  if (type === 'MAIL') return (desc.CityDescription as string) ?? null;
   if (type === 'UKRMAIL') {
     const city = desc.CITY_UA as string;
     const addr = desc.ADDRESS as string;
@@ -92,11 +97,18 @@ function getDeliveryAddress(type: string | null | undefined, desc: Record<string
 function DeliveryCell({ type, desc }: { type?: string | null; desc?: Record<string, unknown> | null }) {
   const label = type ? (DELIVERY_LABELS[type] ?? type) : null;
   const address = getDeliveryAddress(type, desc);
+  const category = desc?.CategoryOfWarehouse as string | undefined;
+  const categoryLabel = category ? (WAREHOUSE_CATEGORY_LABELS[category] ?? category) : null;
+  const postalCode = desc?.PostalCodeUA as string | undefined;
+  const number = desc?.Number as string | undefined;
   if (!label && !address) return <span className="text-gray-300 dark:text-gray-600">—</span>;
   return (
     <div className="flex flex-col gap-0.5" style={{ maxWidth: 180, minWidth: 150 }}>
       {label && <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{label}</span>}
+      {categoryLabel && <span className="text-xs text-gray-500 dark:text-gray-400">{categoryLabel}</span>}
+      {number && <span className="text-xs text-gray-500 dark:text-gray-400">№{number}</span>}
       {address && <span className="text-xs text-gray-500 dark:text-gray-400">{address}</span>}
+      {postalCode && <span className="text-xs text-gray-400 dark:text-gray-500">{postalCode}</span>}
     </div>
   );
 }
