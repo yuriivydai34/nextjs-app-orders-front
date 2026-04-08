@@ -275,9 +275,6 @@ function FloatInput({
   return (
     <div className={`relative mt-5 ${className ?? 'w-full'}`}>
       <div className="relative w-full inline-flex items-center bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 h-10 rounded-lg px-3 gap-1 focus-within:ring-2 focus-within:ring-blue-500 transition-colors">
-        <label className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 pointer-events-none transition-all duration-150 peer-placeholder-shown:top-1/2 -top-5 text-xs">
-          {label}{required && <span className="text-red-500 ml-0.5">*</span>}
-        </label>
         <input
           name={name}
           type={type}
@@ -289,6 +286,9 @@ function FloatInput({
           placeholder=" "
           className="peer w-full bg-transparent outline-none text-sm text-gray-900 dark:text-gray-100 placeholder-transparent h-full pt-1"
         />
+        <label className="absolute left-3 -top-5 text-xs text-gray-500 pointer-events-none transition-all duration-150 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-sm">
+          {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+        </label>
         {suffix && <span className="text-xs text-gray-400 shrink-0">{suffix}</span>}
       </div>
     </div>
