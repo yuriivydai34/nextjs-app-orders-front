@@ -18,11 +18,11 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-60 shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
-      <div className="h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-800">
+    <aside className="w-60 shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col h-screen sticky top-0">
+      <div className="h-16 shrink-0 flex items-center px-6 border-b border-gray-200 dark:border-gray-800">
         <Image src="/logo_gaderia.png" alt="Gaderia" width={120} height={32} className="object-contain" />
       </div>
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         {navItems.map(({ href, label, icon }) => {
           const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
           return (
