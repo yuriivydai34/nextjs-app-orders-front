@@ -7,11 +7,11 @@ import { useState } from 'react';
 import { logout } from '@/app/actions/auth';
 
 const navItems = [
-  { href: '/dashboard', label: 'Огляд', icon: '▦' },
+  { href: '/dashboard/products', label: 'Продукти', icon: '📦' },
   { href: '/dashboard/orders', label: 'Замовлення', icon: '📋' },
-  { href: '/dashboard/customers', label: 'Клієнти', icon: '👥' },
-  { href: '/dashboard/products', label: 'Товари', icon: '📦' },
+  { href: '/dashboard/customers', label: 'Користувачі', icon: '👥' },
   { href: '/dashboard/report', label: 'Звіти', icon: '📊' },
+  { href: '/dashboard/overview', label: 'Огляд', icon: '▦' },
   { href: '/dashboard/settings', label: 'Налаштування', icon: '⚙' },
 ];
 
@@ -109,9 +109,6 @@ export default function Sidebar() {
           </button>
         </div>
       </aside>
-
-      {/* Desktop spacer so content doesn't go under sidebar */}
-      <div className={`hidden md:block shrink-0 transition-all duration-300 ${collapsed ? 'w-16' : 'w-60'}`} />
     </>
   );
 }

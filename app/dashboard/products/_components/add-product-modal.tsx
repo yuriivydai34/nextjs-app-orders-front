@@ -59,7 +59,7 @@ export default function AddProductModal() {
         onClick={open}
         className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors"
       >
-        + Додати товар
+        + Додати
       </button>
 
       <dialog

@@ -76,7 +76,7 @@ function ProductsContent() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Товари
+          Всі Продукти
           {total > 0 && <span className="ml-2 text-sm font-normal text-gray-400">{total}</span>}
         </h2>
         <AddProductModal />
