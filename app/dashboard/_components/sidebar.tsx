@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { logout } from '@/app/actions/auth';
+
 
 const navItems = [
   { href: '/dashboard/products', label: 'Продукти', icon: '📦' },
@@ -97,17 +97,6 @@ export default function Sidebar() {
           })}
         </nav>
 
-        {/* Logout */}
-        <div className="px-2 py-4 shrink-0 border-t border-gray-200 dark:border-gray-800">
-          <button
-            onClick={logout}
-            title={collapsed ? 'Вийти' : undefined}
-            className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-          >
-            <span className="text-base leading-none shrink-0">↩</span>
-            {!collapsed && <span>Вийти</span>}
-          </button>
-        </div>
       </aside>
     </>
   );
