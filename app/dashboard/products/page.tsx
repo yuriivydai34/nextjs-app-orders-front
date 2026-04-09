@@ -59,7 +59,7 @@ function ProductsContent() {
     setLoading(true);
     setError(null);
     const token = localStorage.getItem('token') ?? '';
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?page=${page}&limit=10`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?page=${page}&limit=10&sortBy=id_sort&sortOrder=ASC`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
@@ -71,7 +71,7 @@ function ProductsContent() {
       .finally(() => setLoading(false));
   }, [page, reloadKey]);
 
-  const products = [...(result?.data ?? [])].sort((a, b) => (a.id_sort ?? 0) - (b.id_sort ?? 0));
+  const products = result?.data ?? [];
   const total = result?.total ?? 0;
   const limit = result?.limit ?? 10;
   const totalPages = Math.ceil(total / limit);
