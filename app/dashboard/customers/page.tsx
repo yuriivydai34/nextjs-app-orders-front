@@ -33,6 +33,7 @@ type CustomersResponse = {
 const COLS = ['ID', 'Компанія', 'Користувач', 'Роль', 'Банк', 'Адреса', ''];
 
 function CustomersContent() {
+  useEffect(() => { document.title = 'Користувачі | Gaderia'; }, []);
   const searchParams = useSearchParams();
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
 

@@ -44,6 +44,7 @@ const JUICE_LABELS: Record<string, string> = {
 const COLS = ['Картинка', 'Назва', 'Довжина', 'Ширина', 'Висота', 'Вага', 'Ціна', 'Тип соку', ''];
 
 function ProductsContent() {
+  useEffect(() => { document.title = 'Продукти | Gaderia'; }, []);
   const searchParams = useSearchParams();
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
 

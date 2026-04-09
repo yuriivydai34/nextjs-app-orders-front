@@ -1,3 +1,5 @@
+export const metadata = { title: 'Налаштування' };
+
 export default function SettingsPage() {
   return (
     <div className="max-w-2xl space-y-8">

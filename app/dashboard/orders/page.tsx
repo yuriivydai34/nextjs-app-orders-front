@@ -123,6 +123,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function OrdersContent() {
+  useEffect(() => { document.title = 'Замовлення | Gaderia'; }, []);
   const searchParams = useSearchParams();
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
   const sort = searchParams.get('sortBy') ?? 'createdAt';

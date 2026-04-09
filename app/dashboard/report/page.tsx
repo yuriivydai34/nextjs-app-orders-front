@@ -48,6 +48,7 @@ const DELIVERY_LABELS: Record<string, string> = {
 };
 
 function ReportContent() {
+  useEffect(() => { document.title = 'Звіти | Gaderia'; }, []);
   const searchParams = useSearchParams();
   const date = searchParams.get('date') ?? '';
 
