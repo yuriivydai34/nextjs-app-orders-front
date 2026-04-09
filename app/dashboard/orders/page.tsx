@@ -83,32 +83,40 @@ const WAREHOUSE_CATEGORY_LABELS: Record<string, string> = {
   Postomat: 'Поштомат',
 };
 
-function getDeliveryAddress(type: string | null | undefined, desc: Record<string, unknown> | null | undefined): string | null {
-  if (!desc) return null;
-  if (type === 'MAIL') return (desc.CityDescription as string) ?? null;
-  if (type === 'UKRMAIL') {
-    const city = desc.CITY_UA as string;
-    const addr = desc.ADDRESS as string;
-    return [city, addr].filter(Boolean).join(', ') || null;
-  }
-  return null;
-}
-
-function DeliveryCell({ type, desc }: { type?: string | null; desc?: Record<string, unknown> | null }) {
+function DeliveryCell({ type, desc, address }: { type?: string | null; desc?: Record<string, unknown> | null; address?: string | null }) {
   const label = type ? (DELIVERY_LABELS[type] ?? type) : null;
-  const address = getDeliveryAddress(type, desc);
+
+  const present = desc?.Present as string | undefined;
+
+  if (type === 'UKRMAIL' && desc) {
+    const cityType = desc.SHORTPDCITYTYPE_UA as string | undefined;
+    const city = desc.CITY_UA as string | undefined;
+    const poLong = desc.PO_LONG as string | undefined;
+    const postcode = desc.POSTCODE as string | undefined;
+    const cityLine = [cityType, city].filter(Boolean).join(' ') || present || null;
+    return (
+      <div className="flex flex-col gap-0.5" style={{ maxWidth: 180, minWidth: 150 }}>
+        {label && <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{label}</span>}
+        {cityLine && <span className="text-xs text-gray-500 dark:text-gray-400">{cityLine}</span>}
+        {address && <span className="text-xs text-gray-500 dark:text-gray-400">{address}</span>}
+        {poLong && <span className="text-xs text-gray-500 dark:text-gray-400">{poLong}</span>}
+        {postcode && <span className="text-xs text-gray-400 dark:text-gray-500">{postcode}</span>}
+      </div>
+    );
+  }
+
   const category = desc?.CategoryOfWarehouse as string | undefined;
   const categoryLabel = category ? (WAREHOUSE_CATEGORY_LABELS[category] ?? category) : null;
-  const postalCode = desc?.PostalCodeUA as string | undefined;
-  const number = desc?.Number as string | undefined;
-  if (!label && !address) return <span className="text-gray-300 dark:text-gray-600">—</span>;
+  const description = desc?.Description as string | undefined;
+  const cityDescription = desc?.CityDescription as string | undefined || present;
+  if (!label && !categoryLabel && !description && !cityDescription && !address) return <span className="text-gray-300 dark:text-gray-600">—</span>;
   return (
     <div className="flex flex-col gap-0.5" style={{ maxWidth: 180, minWidth: 150 }}>
       {label && <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{label}</span>}
       {categoryLabel && <span className="text-xs text-gray-500 dark:text-gray-400">{categoryLabel}</span>}
-      {number && <span className="text-xs text-gray-500 dark:text-gray-400">№{number}</span>}
-      {address && <span className="text-xs text-gray-500 dark:text-gray-400">{address}</span>}
-      {postalCode && <span className="text-xs text-gray-400 dark:text-gray-500">{postalCode}</span>}
+      {description && <span className="text-xs text-gray-500 dark:text-gray-400">{description}</span>}
+      {cityDescription && <span className="text-xs text-gray-500 dark:text-gray-400">{cityDescription}</span>}
+      {address && <span className="text-xs text-gray-400 dark:text-gray-500">{address}</span>}
     </div>
   );
 }
@@ -210,7 +218,7 @@ function OrdersContent() {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <DeliveryCell type={p.type_delivery} desc={p.delivery_description} />
+                      <DeliveryCell type={p.type_delivery} desc={p.delivery_description} address={p.delivery_address} />
                     </td>
                     <td className="px-4 py-3 text-xs text-gray-700 dark:text-gray-300" style={{ maxWidth: 150, minWidth: 150 }}>
                       {p.ttn ?? <span className="text-gray-300 dark:text-gray-600">—</span>}
