@@ -45,7 +45,7 @@ function CustomersContent() {
     setLoading(true);
     setError(null);
     const token = localStorage.getItem('token') ?? '';
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts?page=${page}&limit=20`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts?page=${page}&limit=10`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
@@ -59,7 +59,7 @@ function CustomersContent() {
 
   const customers = result?.data ?? [];
   const total = result?.total ?? 0;
-  const limit = result?.limit ?? 20;
+  const limit = result?.limit ?? 10;
   const totalPages = Math.ceil(total / limit);
 
   return (

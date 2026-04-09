@@ -154,7 +154,7 @@ function OrdersContent() {
 
   const payments = result?.data ?? [];
   const total = result?.total ?? 0;
-  const limit = result?.limit ?? 20;
+  const limit = result?.limit ?? 10;
   const totalPages = Math.ceil(total / limit);
 
   return (

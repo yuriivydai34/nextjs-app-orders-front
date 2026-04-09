@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ProductActions from './_components/product-actions';
 import AddProductModal from './_components/add-product-modal';
+import SortProductsModal from './_components/sort-products-modal';
 
 type Product = {
   id: number;
@@ -19,6 +20,7 @@ type Product = {
   type_measurement: string | null;
   article: string | null;
   picture: string | null;
+  id_sort?: number | null;
   description?: string | null;
   shipment_weight?: number | null;
   shipment_length?: number | null;
@@ -51,12 +53,13 @@ function ProductsContent() {
   const [result, setResult] = useState<ProductsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     setLoading(true);
     setError(null);
     const token = localStorage.getItem('token') ?? '';
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?page=${page}&limit=20`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?page=${page}&limit=10`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
@@ -66,11 +69,11 @@ function ProductsContent() {
       .then((data) => setResult(data))
       .catch(() => setError('Не вдалося завантажити товари.'))
       .finally(() => setLoading(false));
-  }, [page]);
+  }, [page, reloadKey]);
 
-  const products = result?.data ?? [];
+  const products = [...(result?.data ?? [])].sort((a, b) => (a.id_sort ?? 0) - (b.id_sort ?? 0));
   const total = result?.total ?? 0;
-  const limit = result?.limit ?? 20;
+  const limit = result?.limit ?? 10;
   const totalPages = Math.ceil(total / limit);
 
   return (
@@ -80,7 +83,10 @@ function ProductsContent() {
           Всі Продукти
           {total > 0 && <span className="ml-2 text-sm font-normal text-gray-400">{total}</span>}
         </h2>
-        <AddProductModal />
+        <div className="flex items-center gap-2">
+          <AddProductModal />
+          <SortProductsModal onSaved={() => setReloadKey((k) => k + 1)} />
+        </div>
       </div>
 
       {loading ? (
