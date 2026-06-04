@@ -23,13 +23,13 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
       - name: Deploy via rsync
-        uses: burnett01/rsync-deployments@7.0.1
-        with:
-          switches: -avz --delete
-          path: out/
-          remote_path: /home/gaderia/gaderia.com.ua/next-admin/
-          remote_host: ${{ secrets.SSH_HOST }}
-          remote_user: ${{ secrets.SSH_USER }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          rsh: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes
+        run: |
+          rsync -avz --delete -e "ssh -o IdentitiesOnly=yes" out/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/gaderia/gaderia.com.ua/next-admin/
