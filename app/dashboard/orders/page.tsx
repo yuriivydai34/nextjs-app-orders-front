@@ -194,7 +194,7 @@ function OrdersContent() {
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Метод оплати</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Вартість доставки</th>
                   <th className="text-left px-4 py-3"><SortableHeader column="amount" label="Вартість" /></th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">ID замовлення</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Чек</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -233,7 +233,9 @@ function OrdersContent() {
                       {p.amount.toLocaleString()} {p.currency}
                     </td>
                     <td className="px-4 py-3 font-mono text-xs text-gray-600 dark:text-gray-300" style={{ maxWidth: 300, minWidth: 300 }}>
-                      {p.order_id}
+                      {p.cashier_check?.id
+                        ? <a href={`https://check.checkbox.ua/${p.cashier_check.id}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{p.cashier_check.id}</a>
+                        : <span className="text-gray-300 dark:text-gray-600">—</span>}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-4">

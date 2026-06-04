@@ -32,13 +32,11 @@ type Payment = {
   ttn: string | null;
   createdAt: number;
   updatedAt: string;
-  cashier_check: { id?: string; message?: string } | null;
   full_name?: string | null;
   email?: string | null;
   number?: string | null;
   comment?: string | null;
   payment_method?: string | null;
-  url_payment?: string | null;
   type_delivery?: string | null;
   delivery_description?: Record<string, unknown> | null;
   delivery_address?: string | null;
@@ -109,7 +107,6 @@ export default function OrderDetailsModal({ payment }: { payment: Payment }) {
   });
 
   const deliveryAddress = getDeliveryAddress(payment.type_delivery, payment.delivery_description);
-  const checkId = payment.cashier_check?.id;
 
   return (
     <>
@@ -155,19 +152,6 @@ export default function OrderDetailsModal({ payment }: { payment: Payment }) {
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Оплата</p>
             <Row label="Сума">{payment.amount.toLocaleString()} {payment.currency}</Row>
             {payment.payment_method && <Row label="Метод оплати">{payment.payment_method}</Row>}
-            {payment.url_payment && (
-              <Row label="Посилання на оплату">
-                <a href={payment.url_payment} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline truncate">{payment.url_payment}</a>
-              </Row>
-            )}
-            {checkId && (
-              <Row label="Чек">
-                <a href={`https://check.checkbox.ua/${checkId}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{checkId}</a>
-              </Row>
-            )}
-            {payment.cashier_check?.message && !checkId && (
-              <Row label="Чек">{payment.cashier_check.message}</Row>
-            )}
           </section>
 
           {/* Delivery */}
