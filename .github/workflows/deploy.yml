@@ -32,4 +32,4 @@ jobs:
 
       - name: Deploy via rsync
         run: |
-          rsync -avz --delete -e "ssh -o IdentitiesOnly=yes" out/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/gaderia/gaderia.com.ua/next-admin/
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa -o IdentitiesOnly=yes -o PreferredAuthentications=publickey" out/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/gaderia/gaderia.com.ua/next-admin/
