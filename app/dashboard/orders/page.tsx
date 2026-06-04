@@ -188,6 +188,7 @@ function OrdersContent() {
                 <tr className="border-b border-gray-200 dark:border-gray-800">
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Користувач</th>
                   <th className="text-left px-4 py-3"><SortableHeader column="status" label="Статус" /></th>
+                  <th className="text-left px-4 py-3"><SortableHeader column="createdAt" label="Дата" /></th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Товари</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Доставка</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">ТТН</th>
@@ -211,6 +212,9 @@ function OrdersContent() {
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={p.status} />
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                      {new Date(p.createdAt < 1e10 ? p.createdAt * 1000 : p.createdAt).toLocaleString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </td>
                     <td className="px-4 py-3">
                       {p.catalog_list_id?.length > 0 && (
