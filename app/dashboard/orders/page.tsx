@@ -186,6 +186,7 @@ function OrdersContent() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-800">
+                  <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">№</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Користувач</th>
                   <th className="text-left px-4 py-3"><SortableHeader column="status" label="Статус" /></th>
                   <th className="text-left px-4 py-3"><SortableHeader column="createdAt" label="Дата" /></th>
@@ -202,6 +203,9 @@ function OrdersContent() {
               <tbody>
                 {payments.map((p) => (
                   <tr key={p.id} className="border-b last:border-0 border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <td className="px-4 py-3 font-mono text-xs text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                      {p.id}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-col gap-0.5">
                         {p.full_name && <span className="text-sm text-gray-900 dark:text-gray-100">{p.full_name}</span>}

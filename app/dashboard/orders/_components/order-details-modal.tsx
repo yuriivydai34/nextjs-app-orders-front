@@ -129,7 +129,7 @@ export default function OrderDetailsModal({ payment }: { payment: Payment }) {
         <header className="flex items-center justify-between py-4 px-6 border-b border-gray-100 dark:border-gray-800">
           <div>
             <p className="text-base font-semibold text-gray-900 dark:text-gray-100">Деталі замовлення</p>
-            <p className="text-xs text-gray-400 font-mono mt-0.5">{payment.order_id}</p>
+            <p className="text-xs text-gray-400 font-mono mt-0.5">№ {payment.id}</p>
           </div>
           <span className={`inline-flex px-2 py-0.5 rounded-md text-xs font-medium ${STATUS_STYLES[payment.status] ?? 'bg-gray-100 text-gray-600'}`}>
             {STATUS_LABELS[payment.status] ?? payment.status}
