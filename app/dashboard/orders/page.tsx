@@ -4,9 +4,9 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import EditOrderModal from './_components/edit-order-modal';
+import SortableHeader from './_components/sortable-header';
 import OrderDetailsModal from './_components/order-details-modal';
 import OrderProductsModal from './_components/order-products-modal';
-import SortableHeader from './_components/sortable-header';
 import StatusFilter from './_components/status-filter';
 
 type Payment = {
@@ -134,7 +134,7 @@ function OrdersContent() {
   useEffect(() => { document.title = 'Замовлення | Gaderia'; }, []);
   const searchParams = useSearchParams();
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
-  const sort = searchParams.get('sortBy') ?? 'createdAt';
+  const sort = searchParams.get('sortBy');
   const order = searchParams.get('sortOrder') === 'ASC' ? 'ASC' : 'DESC';
   const status = searchParams.get('status') ?? '';
 
@@ -146,7 +146,8 @@ function OrdersContent() {
     setLoading(true);
     setError(null);
     const token = localStorage.getItem('token') ?? '';
-    const qs = new URLSearchParams({ page: String(page), limit: '20', sortBy: sort, sortOrder: order });
+    const qs = new URLSearchParams({ page: String(page), limit: '20' });
+    if (sort) { qs.set('sortBy', sort); qs.set('sortOrder', order); }
     if (status) qs.set('status', status);
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments?${qs.toString()}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -262,7 +263,7 @@ function OrdersContent() {
               {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}
             </p>
             <div className="flex items-center gap-1">
-              <PaginationLink href={`?page=${page - 1}&sortBy=${sort}&sortOrder=${order}${status ? `&status=${status}` : ''}`} disabled={page <= 1}>← Назад</PaginationLink>
+              <PaginationLink href={`?page=${page - 1}${sort ? `&sortBy=${sort}&sortOrder=${order}` : ''}${status ? `&status=${status}` : ''}`} disabled={page <= 1}>← Назад</PaginationLink>
               {Array.from({ length: totalPages }, (_, i) => i + 1)
                 .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
                 .reduce<(number | 'ellipsis')[]>((acc, p, idx, arr) => {
@@ -274,7 +275,7 @@ function OrdersContent() {
                   p === 'ellipsis' ? (
                     <span key={`e-${i}`} className="px-2 text-gray-400">…</span>
                   ) : (
-                    <PaginationLink key={p} href={`?page=${p}&sortBy=${sort}&sortOrder=${order}${status ? `&status=${status}` : ''}`} active={p === page}>{p}</PaginationLink>
+                    <PaginationLink key={p} href={`?page=${p}${sort ? `&sortBy=${sort}&sortOrder=${order}` : ''}${status ? `&status=${status}` : ''}`} active={p === page}>{p}</PaginationLink>
                   )
                 )}
               <PaginationLink href={`?page=${page + 1}&sortBy=${sort}&sortOrder=${order}${status ? `&status=${status}` : ''}`} disabled={page >= totalPages}>Далі →</PaginationLink>

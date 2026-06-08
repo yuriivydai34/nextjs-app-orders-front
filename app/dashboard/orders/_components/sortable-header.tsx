@@ -13,7 +13,7 @@ export default function SortableHeader({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const currentSort = searchParams.get('sortBy') ?? 'createdAt';
+  const currentSort = searchParams.get('sortBy');
   const currentOrder = searchParams.get('sortOrder') ?? 'DESC';
 
   const isActive = currentSort === column;
