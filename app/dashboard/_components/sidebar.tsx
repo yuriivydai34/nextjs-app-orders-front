@@ -57,6 +57,7 @@ export default function Sidebar() {
               alt="Gaderia"
               width={120}
               height={32}
+              loading="eager"
               className="object-contain flex-1 min-w-0"
             />
           )}
