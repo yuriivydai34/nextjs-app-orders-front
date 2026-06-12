@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ExportButton from '../orders/_components/export-button';
+import { apiFetch } from '../../lib/api';
 import ReportDatePicker from './_components/report-date-picker';
 
 type Payment = {
@@ -64,11 +65,8 @@ function ReportContent() {
     }
     setLoading(true);
     setFetchError(null);
-    const token = localStorage.getItem('token') ?? '';
     const qs = new URLSearchParams({ page: '1', limit: '100', sortBy: 'createdAt', sortOrder: 'DESC', date });
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments?${qs}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/payments?${qs}`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch');
         return res.json() as Promise<PaymentsResponse>;

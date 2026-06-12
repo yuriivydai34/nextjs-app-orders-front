@@ -8,6 +8,7 @@ import SortableHeader from './_components/sortable-header';
 import OrderDetailsModal from './_components/order-details-modal';
 import OrderProductsModal from './_components/order-products-modal';
 import StatusFilter from './_components/status-filter';
+import { apiFetch } from '../../lib/api';
 
 type Payment = {
   id: number;
@@ -145,13 +146,10 @@ function OrdersContent() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    const token = localStorage.getItem('token') ?? '';
     const qs = new URLSearchParams({ page: String(page), limit: '20' });
     if (sort) { qs.set('sortBy', sort); qs.set('sortOrder', order); }
     if (status) qs.set('status', status);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments?${qs.toString()}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/payments?${qs.toString()}`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch payments');
         return res.json();

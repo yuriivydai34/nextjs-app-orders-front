@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { updateProduct } from '@/app/actions/products';
+import { apiFetch } from '@/app/lib/api';
 
 type Product = {
   id: number;
@@ -23,10 +24,7 @@ export default function SortProductsModal({ onSaved }: { onSaved: () => void }) 
     setFetching(true);
     dialogRef.current?.showModal();
     try {
-      const token = localStorage.getItem('token') ?? '';
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?page=1&limit=1000`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?page=1&limit=1000`);
       if (!res.ok) throw new Error();
       const data = await res.json();
       const sorted = [...(data.data ?? [])].sort((a, b) => (a.id_sort ?? 0) - (b.id_sort ?? 0));

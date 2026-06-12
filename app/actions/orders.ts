@@ -1,12 +1,9 @@
-export async function updateOrder(id: number, data: { ttn?: string; status?: string }) {
-  const token = localStorage.getItem('token') ?? '';
+import { apiFetch } from '../lib/api';
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/${id}`, {
+export async function updateOrder(id: number, data: { ttn?: string; status?: string }) {
+  const res = await apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/${id}`, {
     method: 'PATCH',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
 

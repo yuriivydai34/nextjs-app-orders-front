@@ -1,14 +1,9 @@
-function getToken() {
-  return localStorage.getItem('token') ?? '';
-}
+import { apiFetch } from '../lib/api';
 
 export async function updateCustomer(id: string | number, data: Record<string, unknown>) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts/${id}`, {
+  const res = await apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts/${id}`, {
     method: 'PATCH',
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-      'Content-Type': 'application/json',
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
 
@@ -19,9 +14,8 @@ export async function updateCustomer(id: string | number, data: Record<string, u
 }
 
 export async function deleteCustomer(id: string | number) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts/${id}`, {
+  const res = await apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts/${id}`, {
     method: 'DELETE',
-    headers: { Authorization: `Bearer ${getToken()}` },
   });
 
   if (!res.ok) {

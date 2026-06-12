@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import CustomerActions from './_components/customer-actions';
+import { apiFetch } from '../../lib/api';
 
 type Customer = {
   id: string | number;
@@ -44,10 +45,7 @@ function CustomersContent() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    const token = localStorage.getItem('token') ?? '';
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts?page=${page}&limit=10`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts?page=${page}&limit=10`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch customers');
         return res.json();

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { apiFetch } from '@/app/lib/api';
 
 export default function ExportButton({ initialDate }: { initialDate?: string }) {
   const [loading, setLoading] = useState(false);
@@ -14,10 +15,7 @@ export default function ExportButton({ initialDate }: { initialDate?: string }) 
       const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/payments/report`);
       if (date) url.searchParams.set('date', date);
 
-      const token = localStorage.getItem('token') ?? '';
-      const res = await fetch(url.toString(), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await apiFetch(url.toString());
       if (!res.ok) throw new Error();
       const filePath: string = await res.text();
       window.open(`${process.env.NEXT_PUBLIC_API_URL}${filePath}`);

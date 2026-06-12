@@ -6,6 +6,7 @@ import Link from 'next/link';
 import ProductActions from './_components/product-actions';
 import AddProductModal from './_components/add-product-modal';
 import SortProductsModal from './_components/sort-products-modal';
+import { apiFetch } from '../../lib/api';
 
 type Product = {
   id: number;
@@ -58,10 +59,7 @@ function ProductsContent() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    const token = localStorage.getItem('token') ?? '';
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?page=${page}&limit=10&sortBy=id_sort&sortOrder=ASC`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?page=${page}&limit=10&sortBy=id_sort&sortOrder=ASC`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch products');
         return res.json();
