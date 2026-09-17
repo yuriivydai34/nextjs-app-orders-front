@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import CustomerActions from './_components/customer-actions';
 import CustomerSearch from './_components/customer-search';
@@ -36,6 +36,7 @@ const COLS = ['ID', 'Компанія', 'Користувач', 'Роль', 'Б�
 
 function CustomersContent() {
   useEffect(() => { document.title = 'Користувачі | Gaderia'; }, []);
+  const router = useRouter();
   const searchParams = useSearchParams();
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
   const search = searchParams.get('search') ?? '';
@@ -63,6 +64,16 @@ function CustomersContent() {
   const total = result?.total ?? 0;
   const limit = result?.limit ?? 10;
   const totalPages = Math.ceil(total / limit);
+
+  // A page number left over from a wider result set (e.g. ?search=x&page=3
+  // bookmarked or reached via the back button) would render an empty table
+  // even though there are matches. Fall back to the first page.
+  useEffect(() => {
+    if (!result || total === 0 || page <= totalPages) return;
+    const qs = new URLSearchParams({ page: '1' });
+    if (search) qs.set('search', search);
+    router.replace(`?${qs.toString()}`);
+  }, [result, total, page, totalPages, search, router]);
 
   const pageHref = (p: number) => {
     const qs = new URLSearchParams({ page: String(p) });
