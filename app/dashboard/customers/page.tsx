@@ -5,8 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import CustomerActions from './_components/customer-actions';
 import CustomerSearch from './_components/customer-search';
-import SourceFilter from './_components/source-filter';
-import WooSyncButton, { CUSTOMERS_REFRESH_EVENT } from './_components/woo-sync-button';
 import ExportCustomersButton from './_components/export-customers-button';
 import { apiFetch } from '../../lib/api';
 
@@ -24,7 +22,6 @@ type Customer = {
   region?: string | null;
   settlement?: string | null;
   address?: string | null;
-  source?: string | null;
   [key: string]: unknown;
 };
 
@@ -35,7 +32,7 @@ type CustomersResponse = {
   limit: number;
 };
 
-const COLS = ['ID', 'Компанія', 'Користувач', 'Роль', 'Банк', 'Адреса', 'Джерело', ''];
+const COLS = ['ID', 'Компанія', 'Користувач', 'Роль', 'Банк', 'Адреса', ''];
 
 function CustomersContent() {
   useEffect(() => { document.title = 'Користувачі | Gaderia'; }, []);
@@ -43,25 +40,16 @@ function CustomersContent() {
   const searchParams = useSearchParams();
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
   const search = searchParams.get('search') ?? '';
-  const source = searchParams.get('source') ?? '';
 
   const [result, setResult] = useState<CustomersResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [reloadKey, setReloadKey] = useState(0);
-
-  useEffect(() => {
-    const refetch = () => setReloadKey((k) => k + 1);
-    window.addEventListener(CUSTOMERS_REFRESH_EVENT, refetch);
-    return () => window.removeEventListener(CUSTOMERS_REFRESH_EVENT, refetch);
-  }, []);
 
   useEffect(() => {
     setLoading(true);
     setError(null);
     const qs = new URLSearchParams({ page: String(page), limit: '10' });
     if (search) qs.set('search', search);
-    if (source) qs.set('source', source);
     apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/accounts?${qs.toString()}`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch customers');
@@ -70,7 +58,7 @@ function CustomersContent() {
       .then((data) => setResult(data))
       .catch(() => setError('Не вдалося завантажити клієнтів.'))
       .finally(() => setLoading(false));
-  }, [page, search, source, reloadKey]);
+  }, [page, search]);
 
   const customers = result?.data ?? [];
   const total = result?.total ?? 0;
@@ -84,14 +72,12 @@ function CustomersContent() {
     if (!result || total === 0 || page <= totalPages) return;
     const qs = new URLSearchParams({ page: '1' });
     if (search) qs.set('search', search);
-    if (source) qs.set('source', source);
     router.replace(`?${qs.toString()}`);
-  }, [result, total, page, totalPages, search, source, router]);
+  }, [result, total, page, totalPages, search, router]);
 
   const pageHref = (p: number) => {
     const qs = new URLSearchParams({ page: String(p) });
     if (search) qs.set('search', search);
-    if (source) qs.set('source', source);
     return `?${qs.toString()}`;
   };
 
@@ -103,14 +89,8 @@ function CustomersContent() {
       </h2>
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <CustomerSearch />
-          <SourceFilter />
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <WooSyncButton />
-          <ExportCustomersButton search={search} source={source} />
-        </div>
+        <CustomerSearch />
+        <ExportCustomersButton search={search} />
       </div>
 
       {loading ? (
@@ -203,9 +183,6 @@ function CustomersContent() {
                       })()}
                     </td>
                     <td className="py-3 px-3 align-middle">
-                      <SourceBadge source={c.source} />
-                    </td>
-                    <td className="py-3 px-3 align-middle">
                       <CustomerActions customer={c} />
                     </td>
                   </tr>
@@ -248,21 +225,6 @@ export default function CustomersPage() {
     <Suspense fallback={<p className="text-sm text-gray-500 dark:text-gray-400">Завантаження…</p>}>
       <CustomersContent />
     </Suspense>
-  );
-}
-
-function SourceBadge({ source }: { source?: string | null }) {
-  if (source === 'woocommerce') {
-    return (
-      <span className="inline-flex px-2 py-0.5 rounded-md text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 whitespace-nowrap">
-        Сайт
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-      Свої
-    </span>
   );
 }
 

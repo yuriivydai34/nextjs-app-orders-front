@@ -4,26 +4,43 @@ import { useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
 
 type Row = Record<string, unknown>;
+type Seen = { value: string; firstSeen: string | null; lastSeen: string | null };
 
 const PAGE_SIZE = 500;
 
-const COLUMNS: { key: string; label: string }[] = [
-  { key: 'id',                   label: 'ID' },
-  { key: 'full_name',            label: "Повне ім'я" },
-  { key: 'email',                label: 'Email' },
-  { key: 'number',               label: 'Телефон' },
-  { key: 'role',                 label: 'Роль' },
-  { key: 'name_company',         label: 'Назва компанії' },
-  { key: 'code_company',         label: 'ЄДРПОУ' },
-  { key: 'type_account_subject', label: 'Тип компанії' },
-  { key: 'name_bank',            label: 'Назва банку' },
-  { key: 'number_bank',          label: 'Рахунок' },
-  { key: 'region',               label: 'Область' },
-  { key: 'settlement',           label: 'Місто' },
-  { key: 'address',              label: 'Адреса' },
-  { key: 'is_email_confirmation', label: 'Email підтверджено' },
-  { key: 'createdAt',            label: 'Створено' },
+// Flat columns first, then what only exists in source_data. Everything a person
+// ever used is exported, not just the newest value.
+const COLUMNS: { label: string; get: (row: Row) => unknown }[] = [
+  { label: 'ID',            get: (r) => r.id },
+  { label: "Ім'я",          get: (r) => r.full_name },
+  { label: 'По батькові',   get: (r) => list(r, 'patronymics').join(' / ') },
+  { label: 'Email',         get: (r) => r.email },
+  { label: 'Усі email',     get: (r) => seen(r, 'emails').map((e) => e.value).join(' / ') },
+  { label: 'Email з',       get: (r) => seen(r, 'emails')[0]?.firstSeen ?? '' },
+  { label: 'Телефон',       get: (r) => r.number },
+  { label: 'Усі телефони',  get: (r) => seen(r, 'phones').map((p) => p.value).join(' / ') },
+  { label: 'Телефон з',     get: (r) => seen(r, 'phones')[0]?.firstSeen ?? '' },
+  { label: 'Компанія',      get: (r) => r.name_company },
+  { label: 'Область',       get: (r) => r.region },
+  { label: 'Місто',         get: (r) => r.settlement },
+  { label: 'Адреса',        get: (r) => r.address },
+  { label: 'Усі адреси',    get: (r) => list(r, 'addresses').join(' / ') },
+  { label: 'Замовлень',     get: (r) => data(r).ordersCount ?? 0 },
+  { label: 'Сума',          get: (r) => data(r).totalSpent ?? 0 },
+  { label: 'Перше замовлення',   get: (r) => r.first_order_at },
+  { label: 'Останнє замовлення', get: (r) => r.last_order_at },
+  { label: 'Коментарі',     get: (r) => list(r, 'notes').join(' / ') },
 ];
+
+function data(row: Row): Record<string, unknown> {
+  return (row.source_data ?? {}) as Record<string, unknown>;
+}
+function seen(row: Row, key: string): Seen[] {
+  return (data(row)[key] as Seen[]) ?? [];
+}
+function list(row: Row, key: string): string[] {
+  return (data(row)[key] as string[]) ?? [];
+}
 
 // Excel in a uk locale splits on ';', so that is the separator here.
 const SEP = ';';
@@ -42,17 +59,17 @@ function cell(value: unknown): string {
 function toCsv(rows: Row[]): string {
   const lines = [COLUMNS.map((c) => cell(c.label)).join(SEP)];
   for (const row of rows) {
-    lines.push(COLUMNS.map((c) => cell(row[c.key])).join(SEP));
+    lines.push(COLUMNS.map((c) => cell(c.get(row))).join(SEP));
   }
   return lines.join('\r\n');
 }
 
-export default function ExportCustomersButton({ search }: { search?: string }) {
+export default function ExportShopCustomersButton({ search }: { search?: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function fetchPage(page: number): Promise<{ data: Row[]; total: number }> {
-    const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/accounts`);
+    const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/customers`);
     url.searchParams.set('page', String(page));
     url.searchParams.set('limit', String(PAGE_SIZE));
     if (search) url.searchParams.set('search', search);
@@ -79,7 +96,7 @@ export default function ExportCustomersButton({ search }: { search?: string }) {
       const href = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = href;
-      link.download = `clients-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.download = `shop-customers-${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(link);
       link.click();
       link.remove();

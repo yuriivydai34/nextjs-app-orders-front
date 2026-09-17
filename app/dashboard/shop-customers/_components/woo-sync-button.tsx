@@ -11,8 +11,8 @@ type SyncResult = {
   linkedToExisting: number;
 };
 
-/** The customers table listens for this and refetches. */
-export const CUSTOMERS_REFRESH_EVENT = 'customers:refresh';
+/** The table on this page listens for this and refetches. */
+export const SHOP_CUSTOMERS_REFRESH_EVENT = 'shop-customers:refresh';
 
 export default function WooSyncButton() {
   const [loading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ export default function WooSyncButton() {
         `Замовлень: ${r.ordersScanned} · нових: ${r.created} · оновлено: ${r.updated} · зіставлено: ${r.linkedToExisting}`,
       );
       // Refetch the table in place, so the summary above stays readable.
-      window.dispatchEvent(new CustomEvent(CUSTOMERS_REFRESH_EVENT));
+      window.dispatchEvent(new CustomEvent(SHOP_CUSTOMERS_REFRESH_EVENT));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Помилка синхронізації');
     } finally {
