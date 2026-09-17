@@ -9,14 +9,13 @@ type Customer = {
   email?: string | null;
   number?: string | null;
   role?: string | null;
-  company_name?: string | null;
-  company_code?: string | null;
-  company_type?: string | null;
-  bank_name?: string | null;
-  bank_account?: string | null;
-  bank_mfo?: string | null;
+  name_company?: string | null;
+  code_company?: string | number | null;
+  type_account_subject?: string | null;
+  name_bank?: string | null;
+  number_bank?: string | null;
   region?: string | null;
-  city?: string | null;
+  settlement?: string | null;
   address?: string | null;
 };
 
@@ -34,14 +33,13 @@ export default function CustomerActions({ customer }: { customer: Customer }) {
       email:        form.get('email') as string,
       number:       form.get('number') as string,
       role:         form.get('role') as string,
-      company_name: form.get('company_name') as string,
-      company_code: form.get('company_code') as string,
-      company_type: form.get('company_type') as string,
-      bank_name:    form.get('bank_name') as string,
-      bank_account: form.get('bank_account') as string,
-      bank_mfo:     form.get('bank_mfo') as string,
+      name_company: form.get('name_company') as string,
+      code_company: form.get('code_company') as string,
+      type_account_subject: form.get('type_account_subject') as string,
+      name_bank:    form.get('name_bank') as string,
+      number_bank: form.get('number_bank') as string,
       region:       form.get('region') as string,
-      city:         form.get('city') as string,
+      settlement:         form.get('settlement') as string,
       address:      form.get('address') as string,
     };
     setError(null);
@@ -119,21 +117,20 @@ export default function CustomerActions({ customer }: { customer: Customer }) {
 
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mt-2">Адреса</p>
                 <FloatInput label="Область" name="region" defaultValue={customer.region ?? ''} />
-                <FloatInput label="Місто" name="city" defaultValue={customer.city ?? ''} />
+                <FloatInput label="Місто" name="settlement" defaultValue={customer.settlement ?? ''} />
                 <FloatInput label="Адреса" name="address" defaultValue={customer.address ?? ''} />
               </div>
 
               {/* Right column */}
               <div className="flex flex-col gap-4 w-1/2">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Компанія</p>
-                <FloatInput label="Назва компанії" name="company_name" defaultValue={customer.company_name ?? ''} />
-                <FloatInput label="ЄДРПОУ" name="company_code" defaultValue={customer.company_code ?? ''} />
-                <FloatInput label="Тип компанії" name="company_type" defaultValue={customer.company_type ?? ''} />
+                <FloatInput label="Назва компанії" name="name_company" defaultValue={customer.name_company ?? ''} />
+                <FloatInput label="ЄДРПОУ" name="code_company" defaultValue={customer.code_company != null ? String(customer.code_company) : ''} />
+                <FloatInput label="Тип компанії" name="type_account_subject" defaultValue={customer.type_account_subject ?? ''} />
 
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mt-2">Банк</p>
-                <FloatInput label="Назва банку" name="bank_name" defaultValue={customer.bank_name ?? ''} />
-                <FloatInput label="Рахунок" name="bank_account" defaultValue={customer.bank_account ?? ''} />
-                <FloatInput label="МФО" name="bank_mfo" defaultValue={customer.bank_mfo ?? ''} />
+                <FloatInput label="Назва банку" name="name_bank" defaultValue={customer.name_bank ?? ''} />
+                <FloatInput label="Рахунок" name="number_bank" defaultValue={customer.number_bank ?? ''} />
               </div>
             </div>
 
