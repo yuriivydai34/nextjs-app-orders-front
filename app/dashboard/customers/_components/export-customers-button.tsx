@@ -23,6 +23,7 @@ const COLUMNS: { key: string; label: string }[] = [
   { key: 'address',              label: 'Адреса' },
   { key: 'is_email_confirmation', label: 'Email підтверджено' },
   { key: 'createdAt',            label: 'Створено' },
+  { key: 'source',               label: 'Джерело' },
 ];
 
 // Excel in a uk locale splits on ';', so that is the separator here.
@@ -47,7 +48,7 @@ function toCsv(rows: Row[]): string {
   return lines.join('\r\n');
 }
 
-export default function ExportCustomersButton({ search }: { search?: string }) {
+export default function ExportCustomersButton({ search, source }: { search?: string; source?: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,6 +57,7 @@ export default function ExportCustomersButton({ search }: { search?: string }) {
     url.searchParams.set('page', String(page));
     url.searchParams.set('limit', String(PAGE_SIZE));
     if (search) url.searchParams.set('search', search);
+    if (source) url.searchParams.set('source', source);
 
     const res = await apiFetch(url.toString());
     if (!res.ok) throw new Error('Failed to fetch customers');
