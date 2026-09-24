@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react';
 import { updateCustomer } from '@/app/actions/customers';
+import CustomerDocuments from './customer-documents';
 
 type Customer = {
   id: string | number;
@@ -67,6 +68,8 @@ export default function CustomerActions({ customer }: { customer: Customer }) {
             <path d="M2.5 18.3333H17.5" stroke="#979797" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
+        {/* Only legal entities can upload documents in the app. */}
+        {customer.type_account_subject === 'LEGAL' && <CustomerDocuments accountId={customer.id} />}
       </div>
 
       {/* Edit Modal */}
