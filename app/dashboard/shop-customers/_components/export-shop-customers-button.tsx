@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
+import { orderStats } from './order-stats';
 
 type Row = Record<string, unknown>;
 type Seen = { value: string; firstSeen: string | null; lastSeen: string | null };
@@ -26,7 +27,11 @@ const COLUMNS: { label: string; get: (row: Row) => unknown }[] = [
   { label: 'Адреса',        get: (r) => r.address },
   { label: 'Усі адреси',    get: (r) => list(r, 'addresses').join(' / ') },
   { label: 'Замовлень',     get: (r) => data(r).ordersCount ?? 0 },
-  { label: 'Сума',          get: (r) => data(r).totalSpent ?? 0 },
+  { label: 'Виконано',      get: (r) => stats(r).completed },
+  { label: 'Скасовано',     get: (r) => stats(r).cancelled },
+  { label: 'В роботі',      get: (r) => stats(r).inProgress },
+  { label: 'Сума виконаних', get: (r) => stats(r).completedSum },
+  { label: 'Сума (усі)',    get: (r) => data(r).totalSpent ?? 0 },
   { label: 'Перше замовлення',   get: (r) => r.first_order_at },
   { label: 'Останнє замовлення', get: (r) => r.last_order_at },
   { label: 'Коментарі',     get: (r) => list(r, 'notes').join(' / ') },
@@ -34,6 +39,9 @@ const COLUMNS: { label: string; get: (row: Row) => unknown }[] = [
 
 function data(row: Row): Record<string, unknown> {
   return (row.source_data ?? {}) as Record<string, unknown>;
+}
+function stats(row: Row) {
+  return orderStats(data(row).orders as { status?: string | null; total?: string | null }[] | undefined);
 }
 function seen(row: Row, key: string): Seen[] {
   return (data(row)[key] as Seen[]) ?? [];
@@ -64,7 +72,13 @@ function toCsv(rows: Row[]): string {
   return lines.join('\r\n');
 }
 
-export default function ExportShopCustomersButton({ search }: { search?: string }) {
+export default function ExportShopCustomersButton({
+  search, sortBy, sortOrder,
+}: {
+  search?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -73,6 +87,9 @@ export default function ExportShopCustomersButton({ search }: { search?: string 
     url.searchParams.set('page', String(page));
     url.searchParams.set('limit', String(PAGE_SIZE));
     if (search) url.searchParams.set('search', search);
+    // Same order as on screen, so the file opens with the regulars on top.
+    if (sortBy) url.searchParams.set('sortBy', sortBy);
+    if (sortOrder) url.searchParams.set('sortOrder', sortOrder);
 
     const res = await apiFetch(url.toString());
     if (!res.ok) throw new Error('Failed to fetch customers');

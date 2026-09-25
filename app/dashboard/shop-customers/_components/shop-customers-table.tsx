@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { orderStats, STATUS_LABELS } from './order-stats';
 
 export type Seen = { value: string; firstSeen: string | null; lastSeen: string | null };
 
@@ -59,6 +60,7 @@ export default function ShopCustomersTable({ rows }: { rows: ShopCustomer[] }) {
             const d = c.source_data ?? {};
             const extraEmails = Math.max((d.emails?.length ?? 0) - 1, 0);
             const extraPhones = Math.max((d.phones?.length ?? 0) - 1, 0);
+            const stats = orderStats(d.orders);
             return (
               <tr key={c.id} className="align-top border-b border-gray-100 dark:border-gray-800 last:border-0">
                 <td className="py-3 px-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{c.id}</td>
@@ -97,8 +99,17 @@ export default function ShopCustomersTable({ rows }: { rows: ShopCustomer[] }) {
 
                 <td className="py-3 px-3 whitespace-nowrap">
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-sm text-gray-900 dark:text-gray-100">{d.ordersCount ?? 0}</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">{(d.totalSpent ?? 0).toLocaleString('uk-UA')} ₴</span>
+                    <span className="text-sm text-gray-900 dark:text-gray-100">{stats.total} усього</span>
+                    <span className="text-xs text-green-600 dark:text-green-400">✓ {stats.completed} виконано</span>
+                    {stats.cancelled > 0 && (
+                      <span className="text-xs text-red-500 dark:text-red-400">✕ {stats.cancelled} скасовано</span>
+                    )}
+                    {stats.inProgress > 0 && (
+                      <span className="text-xs text-gray-400">{stats.inProgress} в роботі</span>
+                    )}
+                    <span className="text-xs text-gray-500 dark:text-gray-400" title="Сума виконаних замовлень">
+                      {stats.completedSum.toLocaleString('uk-UA')} ₴
+                    </span>
                   </div>
                 </td>
 
@@ -169,7 +180,7 @@ function Details({ customer }: { customer: ShopCustomer }) {
         <Block title={`Замовлення (${d.orders!.length})`}>
           {[...d.orders!].reverse().slice(0, 30).map((o) => (
             <li key={o.id}>
-              №{o.number ?? o.id} · {shortDate(o.date)} · {o.status} · {o.total} ₴
+              №{o.number ?? o.id} · {shortDate(o.date)} · {STATUS_LABELS[o.status ?? ''] ?? o.status} · {o.total} ₴
               {o.ttn && <> · ТТН {o.ttn}</>}
             </li>
           ))}

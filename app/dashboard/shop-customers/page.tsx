@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { apiFetch } from '../../lib/api';
@@ -8,6 +8,7 @@ import CustomerSearch from './_components/customer-search';
 import ExportShopCustomersButton from './_components/export-shop-customers-button';
 import WooSyncButton, { SHOP_CUSTOMERS_REFRESH_EVENT } from './_components/woo-sync-button';
 import ShopCustomersTable, { ShopCustomer } from './_components/shop-customers-table';
+import CustomerSort, { DEFAULT_SORT, SORTS } from './_components/customer-sort';
 
 type Response = {
   data: ShopCustomer[];
@@ -23,6 +24,8 @@ function ShopCustomersContent() {
   const searchParams = useSearchParams();
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
   const search = searchParams.get('search') ?? '';
+  const sortKey = SORTS[searchParams.get('sort') ?? ''] ? searchParams.get('sort')! : DEFAULT_SORT;
+  const sort = SORTS[sortKey];
 
   const [result, setResult] = useState<Response | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +43,8 @@ function ShopCustomersContent() {
     setError(null);
     const qs = new URLSearchParams({ page: String(page), limit: '10' });
     if (search) qs.set('search', search);
+    qs.set('sortBy', sort.sortBy);
+    qs.set('sortOrder', sort.sortOrder);
     apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/customers?${qs.toString()}`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch customers');
@@ -48,27 +53,26 @@ function ShopCustomersContent() {
       .then((data) => setResult(data))
       .catch(() => setError('Не вдалося завантажити покупців.'))
       .finally(() => setLoading(false));
-  }, [page, search, reloadKey]);
+  }, [page, search, sort, reloadKey]);
 
   const customers = result?.data ?? [];
   const total = result?.total ?? 0;
   const limit = result?.limit ?? 10;
   const totalPages = Math.ceil(total / limit);
 
+  const pageHref = useCallback((p: number) => {
+    const qs = new URLSearchParams({ page: String(p) });
+    if (search) qs.set('search', search);
+    if (sortKey !== DEFAULT_SORT) qs.set('sort', sortKey);
+    return `?${qs.toString()}`;
+  }, [search, sortKey]);
+
   // A page number left over from a wider result set would show an empty table
   // even though there are matches. Fall back to the first page.
   useEffect(() => {
     if (!result || total === 0 || page <= totalPages) return;
-    const qs = new URLSearchParams({ page: '1' });
-    if (search) qs.set('search', search);
-    router.replace(`?${qs.toString()}`);
-  }, [result, total, page, totalPages, search, router]);
-
-  const pageHref = (p: number) => {
-    const qs = new URLSearchParams({ page: String(p) });
-    if (search) qs.set('search', search);
-    return `?${qs.toString()}`;
-  };
+    router.replace(pageHref(1));
+  }, [result, total, page, totalPages, pageHref, router]);
 
   return (
     <div>
@@ -81,10 +85,13 @@ function ShopCustomersContent() {
       </p>
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <CustomerSearch />
+        <div className="flex flex-wrap items-center gap-2 w-full max-w-2xl">
+          <CustomerSearch />
+          <CustomerSort value={sortKey} />
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <WooSyncButton />
-          <ExportShopCustomersButton search={search} />
+          <ExportShopCustomersButton search={search} sortBy={sort.sortBy} sortOrder={sort.sortOrder} />
         </div>
       </div>
 
