@@ -1,6 +1,10 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { apiFetch } from '@/app/lib/api';
+import Stars from '../../_components/stars';
+
+type OrderReview = { rating: number; review: string | null; suggestion: string | null };
 
 type CatalogItem = {
   id: number;
@@ -99,6 +103,18 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 
 export default function OrderDetailsModal({ payment }: { payment: Payment }) {
   const ref = useRef<HTMLDialogElement>(null);
+  // The client's rating, fetched only when a completed order is opened, so
+  // the orders list stays one request. undefined = not loaded, null = none.
+  const [review, setReview] = useState<OrderReview | null | undefined>(undefined);
+
+  function open() {
+    ref.current?.showModal();
+    if (payment.status !== 'COMPLETED' || review !== undefined) return;
+    apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/payment/${payment.id}`)
+      .then((res) => (res.ok ? res.text() : Promise.reject()))
+      .then((text) => setReview(text ? (JSON.parse(text) as OrderReview | null) : null))
+      .catch(() => setReview(null));
+  }
 
   const createdTs = payment.createdAt < 1e10 ? payment.createdAt * 1000 : payment.createdAt;
   const createdDate = new Date(createdTs).toLocaleString('uk-UA', {
@@ -111,7 +127,7 @@ export default function OrderDetailsModal({ payment }: { payment: Payment }) {
   return (
     <>
       <button
-        onClick={() => ref.current?.showModal()}
+        onClick={open}
         title="Деталі замовлення"
         className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
       >
@@ -146,6 +162,23 @@ export default function OrderDetailsModal({ payment }: { payment: Payment }) {
             {payment.number      && <Row label="Телефон">{payment.number}</Row>}
             {payment.comment     && <Row label="Коментар">{payment.comment}</Row>}
           </section>
+
+          {payment.status === 'COMPLETED' && (
+            <section className="flex flex-col gap-2">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Оцінка клієнта</p>
+              {review === undefined ? (
+                <p className="text-sm text-gray-400">Завантаження…</p>
+              ) : review === null ? (
+                <p className="text-sm text-gray-400">Клієнт ще не оцінив замовлення.</p>
+              ) : (
+                <>
+                  <Row label="Оцінка"><Stars rating={review.rating} /></Row>
+                  {review.review && <Row label="Відгук">{review.review}</Row>}
+                  {review.suggestion && <Row label="Побажання">{review.suggestion}</Row>}
+                </>
+              )}
+            </section>
+          )}
 
           {/* Payment */}
           <section className="flex flex-col gap-2">
