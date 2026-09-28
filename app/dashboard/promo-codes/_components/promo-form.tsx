@@ -2,7 +2,7 @@
 
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
-import type { DiscountType, PromoCode } from './promo';
+import { fromDateInput, toDateInput, type DiscountType, type PromoCode } from './promo';
 
 export type PromoFormHandle = { open: (promo?: PromoCode) => void };
 
@@ -43,22 +43,6 @@ const PRESETS: { label: string; hint: string; patch: Partial<Draft> }[] = [
     patch: { first_order_only: false, max_account_age_days: '', usage_limit: '100' },
   },
 ];
-
-// <input type="date"> speaks yyyy-mm-dd in local time.
-function toDateInput(iso: string | null): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
-// A campaign "until 31.10" means through the whole of that day, in Kyiv.
-function fromDateInput(value: string, endOfDay: boolean): string | null {
-  if (!value) return null;
-  const [y, m, d] = value.split('-').map(Number);
-  const date = endOfDay ? new Date(y, m - 1, d, 23, 59, 59, 999) : new Date(y, m - 1, d);
-  return date.toISOString();
-}
 
 const PromoForm = forwardRef<PromoFormHandle, { onSaved: () => void }>(function PromoForm({ onSaved }, ref) {
   const dialogRef = useRef<HTMLDialogElement>(null);

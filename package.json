@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "TZ=Europe/Kyiv node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test 'app/**/*.test.mts'"
   },
   "dependencies": {
     "@heroui/react": "^3.0.1",

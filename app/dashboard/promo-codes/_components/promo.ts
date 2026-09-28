@@ -78,3 +78,19 @@ export const ORDER_STATUS: Record<string, string> = {
   CANCELED: 'Скасовано',
   COMPLETED: 'Виконано',
 };
+
+// <input type="date"> speaks yyyy-mm-dd in local time.
+export function toDateInput(iso: string | null): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+// A campaign "until 31.10" means through the whole of that day, in Kyiv.
+export function fromDateInput(value: string, endOfDay: boolean): string | null {
+  if (!value) return null;
+  const [y, m, d] = value.split('-').map(Number);
+  const date = endOfDay ? new Date(y, m - 1, d, 23, 59, 59, 999) : new Date(y, m - 1, d);
+  return date.toISOString();
+}
