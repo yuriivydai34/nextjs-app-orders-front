@@ -10,6 +10,7 @@ const navItems = [
   { href: '/dashboard/products', label: 'Продукти', icon: '📦' },
   { href: '/dashboard/orders', label: 'Замовлення', icon: '📋' },
   { href: '/dashboard/reviews', label: 'Відгуки', icon: '★' },
+  { href: '/dashboard/promo-codes', label: 'Промокоди', icon: '%' },
   { href: '/dashboard/customers', label: 'Користувачі', icon: '👥' },
   { href: '/dashboard/shop-customers', label: 'Покупці з сайту', icon: '🛒' },
   { href: '/dashboard/report', label: 'Звіти', icon: '📊' },
