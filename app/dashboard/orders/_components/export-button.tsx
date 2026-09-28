@@ -15,10 +15,16 @@ export default function ExportButton({ initialDate }: { initialDate?: string }) 
       const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/payments/report`);
       if (date) url.searchParams.set('date', date);
 
+      // The file comes in the response itself: the report holds clients'
+      // contacts, so it is not left under a public URL any more.
       const res = await apiFetch(url.toString());
       if (!res.ok) throw new Error();
-      const filePath: string = await res.text();
-      window.open(`${process.env.NEXT_PUBLIC_API_URL}${filePath}`);
+      const href = URL.createObjectURL(await res.blob());
+      const a = document.createElement('a');
+      a.href = href;
+      a.download = `payments_${date || new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Kyiv' })}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(href);
     } catch {
       setError('Помилка');
     } finally {
