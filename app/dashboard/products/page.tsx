@@ -1,34 +1,14 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ProductActions from './_components/product-actions';
-import AddProductModal from './_components/add-product-modal';
+import ProductForm, { type Product, type ProductFormHandle } from './_components/product-form';
 import SortProductsModal from './_components/sort-products-modal';
 import { apiFetch } from '../../lib/api';
-import { JUICE_LABELS } from '@/app/lib/juice-types';
+import { productTypeLabel } from '@/app/lib/product-types.ts';
 
-type Product = {
-  id: number;
-  header: string;
-  price: number;
-  price_discount: number;
-  is_discount: boolean;
-  type_product: string | null;
-  type_packaging: string | null;
-  type_juice: string | null;
-  measurement: number;
-  type_measurement: string | null;
-  article: string | null;
-  picture: string | null;
-  id_sort?: number | null;
-  description?: string | null;
-  shipment_weight?: number | null;
-  shipment_length?: number | null;
-  shipment_width?: number | null;
-  shipment_height?: number | null;
-};
 
 type ProductsResponse = {
   data: Product[];
@@ -38,7 +18,7 @@ type ProductsResponse = {
 };
 
 
-const COLS = ['Картинка', 'Назва', 'Довжина', 'Ширина', 'Висота', 'Вага', 'Ціна', 'Тип соку', ''];
+const COLS = ['Картинка', 'Назва', 'Довжина', 'Ширина', 'Висота', 'Вага', 'Ціна', 'Тип', ''];
 
 function ProductsContent() {
   useEffect(() => { document.title = 'Продукти | Gaderia'; }, []);
@@ -49,6 +29,8 @@ function ProductsContent() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [reloadKey, setReloadKey] = useState(0);
+  const formRef = useRef<ProductFormHandle>(null);
+  const reload = () => setReloadKey((k) => k + 1);
 
   useEffect(() => {
     setLoading(true);
@@ -76,8 +58,13 @@ function ProductsContent() {
           {total > 0 && <span className="ml-2 text-sm font-normal text-gray-400">{total}</span>}
         </h2>
         <div className="flex items-center gap-2">
-          <AddProductModal />
-          <SortProductsModal onSaved={() => setReloadKey((k) => k + 1)} />
+          <button
+            onClick={() => formRef.current?.create()}
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors"
+          >
+            + Додати
+          </button>
+          <SortProductsModal onSaved={reload} />
         </div>
       </div>
 
@@ -127,7 +114,12 @@ function ProductsContent() {
                       </div>
                     </td>
                     <td className="py-2 px-3 align-middle text-sm text-gray-900 dark:text-gray-100">
-                      <div className="line-clamp-1 max-w-[200px]">{p.header}</div>
+                      <div className="line-clamp-2 max-w-[240px]">{p.header}</div>
+                      {p.is_active === false && (
+                        <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300" title="Не показується в застосунку">
+                          Приховано
+                        </span>
+                      )}
                     </td>
                     <td className="py-2 px-3 align-middle text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
                       {p.shipment_length ?? '—'} см
@@ -150,10 +142,15 @@ function ProductsContent() {
                       ) : p.price}
                     </td>
                     <td className="py-2 px-3 align-middle text-sm text-gray-700 dark:text-gray-300">
-                      {p.type_juice ? (JUICE_LABELS[p.type_juice] ?? p.type_juice) : '—'}
+                      {productTypeLabel(p)}
                     </td>
                     <td className="py-2 px-3 align-middle">
-                      <ProductActions product={p} />
+                      <ProductActions
+                        product={p}
+                        onEdit={() => formRef.current?.edit(p)}
+                        onDuplicate={() => formRef.current?.duplicate(p)}
+                        onDeleted={reload}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -188,6 +185,8 @@ function ProductsContent() {
           )}
         </>
       )}
+
+      <ProductForm ref={formRef} onSaved={reload} />
     </div>
   );
 }
