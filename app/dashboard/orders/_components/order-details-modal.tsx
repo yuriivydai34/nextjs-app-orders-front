@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
 import Stars from '../../_components/stars';
+import { JUICE_LABELS } from '@/app/lib/juice-types';
 
 type OrderReview = { rating: number; review: string | null; suggestion: string | null };
 
@@ -73,13 +74,6 @@ const WAREHOUSE_CATEGORY_LABELS: Record<string, string> = {
   Postomat: 'Поштомат',
 };
 
-const JUICE_LABELS: Record<string, string> = {
-  APPLE:           'Яблучний',
-  APPLEGRAPE:      'Виноградно-яблучний',
-  CARROTAPPLE:     'Морквяно-яблучний',
-  PEARAPPLE:       'Грушево-яблучний',
-  STRAWBERRYAPPLE: 'Полунично-яблучний',
-};
 
 function getDeliveryAddress(type: string | null | undefined, desc: Record<string, unknown> | null | undefined): string | null {
   if (!desc) return null;

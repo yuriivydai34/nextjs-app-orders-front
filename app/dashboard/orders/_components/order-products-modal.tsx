@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import { JUICE_LABELS } from '@/app/lib/juice-types';
 
 type CatalogItem = {
   id: number;
@@ -23,13 +24,6 @@ type CatalogItem = {
   };
 };
 
-const JUICE_LABELS: Record<string, string> = {
-  APPLE:          'Яблучний',
-  APPLEGRAPE:     'Яблучно-виноградний',
-  CARROTAPPLE:    'Морквяно-яблучний',
-  PEARAPPLE:      'Грушево-яблучний',
-  STRAWBERRYAPPLE:'Полунично-яблучний',
-};
 
 export default function OrderProductsModal({
   orderId,

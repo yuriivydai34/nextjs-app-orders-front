@@ -7,6 +7,7 @@ import ProductActions from './_components/product-actions';
 import AddProductModal from './_components/add-product-modal';
 import SortProductsModal from './_components/sort-products-modal';
 import { apiFetch } from '../../lib/api';
+import { JUICE_LABELS } from '@/app/lib/juice-types';
 
 type Product = {
   id: number;
@@ -36,13 +37,6 @@ type ProductsResponse = {
   limit: number;
 };
 
-const JUICE_LABELS: Record<string, string> = {
-  APPLE:          'Яблучний сік',
-  APPLEGRAPE:     'Виноградно-яблучний сік',
-  CARROTAPPLE:    'Морквяно-яблучний сік',
-  PEARAPPLE:      'Грушево-яблучний сік',
-  STRAWBERRYAPPLE:'Полунично-яблучний сік',
-};
 
 const COLS = ['Картинка', 'Назва', 'Довжина', 'Ширина', 'Висота', 'Вага', 'Ціна', 'Тип соку', ''];
 

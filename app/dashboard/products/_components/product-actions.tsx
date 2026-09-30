@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from 'react';
 import { updateProduct, deleteProduct } from '@/app/actions/products';
+import { JUICE_TYPES } from '@/app/lib/juice-types';
 
 type Product = {
   id: number;
@@ -141,11 +142,7 @@ export default function ProductActions({ product }: { product: Product }) {
                   </FloatSelect>
                   <FloatSelect label="Тип соку" name="type_juice" defaultValue={product.type_juice ?? ''} className="w-1/2">
                     <option value="">Оберіть тип соку</option>
-                    <option value="APPLE">Яблучний сік</option>
-                    <option value="CARROTAPPLE">Морквяно-яблучний сік</option>
-                    <option value="STRAWBERRYAPPLE">Полунично-яблучний сік</option>
-                    <option value="PEARAPPLE">Грушево-яблучний сік</option>
-                    <option value="APPLEGRAPE">Виноградно-яблучний сік</option>
+                    {JUICE_TYPES.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
                   </FloatSelect>
                 </div>
 

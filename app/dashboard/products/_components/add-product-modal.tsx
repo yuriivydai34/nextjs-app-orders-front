@@ -2,11 +2,11 @@
 
 import { useRef, useState, useTransition } from 'react';
 import { createProduct } from '@/app/actions/products';
+import { JUICE_TYPES } from '@/app/lib/juice-types';
 
 const TYPE_PRODUCTS = ['JUICE', 'VINEGAR', 'OTHER'];
 const TYPE_PACKAGINGS = ['BAGINBOX', 'GLASS', 'BOTTLE', 'OTHER'];
 const TYPE_MEASUREMENTS = ['LITER', 'ML', 'KG', 'G'];
-const TYPE_JUICES = ['APPLE', 'STRAWBERRYAPPLE', 'APPLEGRAPE', 'OTHER'];
 
 export default function AddProductModal() {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -119,7 +119,7 @@ export default function AddProductModal() {
             <label className="block text-xs font-medium text-gray-500 dark:text-gray-400">Тип соку</label>
             <select name="type_juice" className={selectCls}>
               <option value="">— немає —</option>
-              {TYPE_JUICES.map((v) => <option key={v} value={v}>{v}</option>)}
+              {JUICE_TYPES.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
             </select>
           </div>
 
