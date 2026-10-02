@@ -11,6 +11,8 @@ export const PRODUCT_TYPES: readonly Choice[] = [
   { value: 'JUICE', label: 'Сік' },
   { value: 'VINEGAR', label: 'Оцет' },
   { value: 'APPLE', label: 'Яблука' },
+  // One kind for now, so no type field of its own (no SUBTYPE entry).
+  { value: 'HONEY', label: 'Мед' },
 ];
 
 export const VINEGAR_TYPES: readonly Choice[] = [
