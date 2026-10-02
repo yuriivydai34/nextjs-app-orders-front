@@ -3,6 +3,7 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { createProduct, updateProduct } from '@/app/actions/products';
 import { MEASUREMENT_TYPES, PACKAGING_TYPES, PRODUCT_TYPES, SUBTYPE } from '@/app/lib/product-types.ts';
+import { BADGE_MAX_LENGTH, BADGE_PRESET, DEFAULT_BADGE_COLOR } from '@/app/lib/product-badges';
 
 export type Product = {
   id: number;
@@ -19,6 +20,10 @@ export type Product = {
   type_measurement: string | null;
   article: string | null;
   picture: string | null;
+  // With a badge, `picture` is the copy with it drawn on and this is the clean one.
+  picture_original?: string | null;
+  badge?: string | null;
+  badge_color?: string | null;
   id_sort?: number | null;
   is_active?: boolean;
   description?: string | null;
@@ -57,6 +62,8 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
   const [kind, setKind] = useState('');
   const [onSale, setOnSale] = useState(false);
   const [picture, setPicture] = useState('');
+  const [badge, setBadge] = useState('');
+  const [badgeColor, setBadgeColor] = useState(DEFAULT_BADGE_COLOR);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -65,7 +72,10 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
     setSource(product);
     setKind(product?.type_product ?? '');
     setOnSale(nextMode !== 'create' && Boolean(product?.is_discount));
-    setPicture(product?.picture ?? '');
+    // The clean picture: the API draws the badge on it again when saving.
+    setPicture(product?.picture_original ?? product?.picture ?? '');
+    setBadge(product?.badge ?? '');
+    setBadgeColor(product?.badge_color ?? DEFAULT_BADGE_COLOR);
     setError(null);
     setOpenCount((n) => n + 1);
     dialogRef.current?.showModal();
@@ -89,6 +99,8 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
       article: get('article'),
       description: get('description'),
       picture,
+      badge: badge.trim(),
+      badge_color: badge.trim() ? badgeColor : '',
       type_product: kind,
       type_packaging: get('type_packaging'),
       measurement: get('measurement'),
@@ -223,9 +235,55 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
             <Field label="Картинка (посилання)">
               <input type="url" value={picture} onChange={(e) => setPicture(e.target.value)} placeholder="https://…" className={INPUT} />
             </Field>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Бейдж на картинці</span>
+              <div className="flex items-center gap-2">
+                <input
+                  value={badge}
+                  onChange={(e) => setBadge(e.target.value)}
+                  maxLength={BADGE_MAX_LENGTH}
+                  placeholder="без бейджа"
+                  aria-label="Текст бейджа"
+                  className={`${INPUT} flex-1`}
+                />
+                <input
+                  type="color"
+                  value={badgeColor}
+                  onChange={(e) => setBadgeColor(e.target.value)}
+                  disabled={!badge.trim()}
+                  title="Колір бейджа"
+                  aria-label="Колір бейджа"
+                  className="h-10 w-10 shrink-0 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent disabled:opacity-40"
+                />
+                {!badge.trim() && (
+                  <button
+                    type="button"
+                    onClick={() => { setBadge(BADGE_PRESET); setBadgeColor(DEFAULT_BADGE_COLOR); }}
+                    className="shrink-0 px-2.5 py-1 rounded-full text-xs font-bold text-white"
+                    style={{ backgroundColor: DEFAULT_BADGE_COLOR }}
+                  >
+                    {BADGE_PRESET}
+                  </button>
+                )}
+              </div>
+              <span className="text-xs text-gray-400 dark:text-gray-500">
+                Малюється на самій картинці — у застосунку з&apos;явиться одразу. Порожнє поле прибирає бейдж.
+              </span>
+            </div>
             {picture && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={picture} alt="" className="w-40 h-40 object-contain rounded-xl bg-gray-50 dark:bg-gray-800" />
+              // A preview only: the real badge is drawn by the API on save.
+              <div className="relative w-40 h-40 rounded-xl bg-gray-50 dark:bg-gray-800 overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={picture} alt="" className="w-full h-full object-contain" />
+                {badge.trim() && (
+                  <span
+                    className="absolute left-0 top-2 pl-2 pr-2.5 py-0.5 rounded-r-full text-[11px] font-bold text-white whitespace-nowrap"
+                    style={{ backgroundColor: badgeColor }}
+                  >
+                    {badge.trim()}
+                  </span>
+                )}
+              </div>
             )}
 
             <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
