@@ -17,12 +17,13 @@ type Draft = {
   first_order_only: boolean;
   max_account_age_days: string;
   is_active: boolean;
+  auto_apply: boolean;
 };
 
 const EMPTY: Draft = {
   code: '', title: '', discount_type: 'PERCENT', discount_value: '',
   usage_limit: '', starts: '', ends: '', first_order_only: false,
-  max_account_age_days: '', is_active: true,
+  max_account_age_days: '', is_active: true, auto_apply: false,
 };
 
 // Not separate kinds of code — each is a set of conditions filled in for you.
@@ -30,17 +31,17 @@ const PRESETS: { label: string; hint: string; patch: Partial<Draft> }[] = [
   {
     label: 'Велком',
     hint: 'Перше замовлення нового користувача',
-    patch: { title: 'Welcome', first_order_only: true, max_account_age_days: '30', usage_limit: '', starts: '', ends: '' },
+    patch: { title: 'Welcome', first_order_only: true, max_account_age_days: '30', usage_limit: '', starts: '', ends: '', auto_apply: true },
   },
   {
     label: 'Акція',
     hint: 'Діє в задані дати',
-    patch: { first_order_only: false, max_account_age_days: '', usage_limit: '' },
+    patch: { first_order_only: false, max_account_age_days: '', usage_limit: '', auto_apply: false },
   },
   {
     label: 'Обмежений',
     hint: 'Перші N замовлень',
-    patch: { first_order_only: false, max_account_age_days: '', usage_limit: '100' },
+    patch: { first_order_only: false, max_account_age_days: '', usage_limit: '100', auto_apply: false },
   },
 ];
 
@@ -65,6 +66,7 @@ const PromoForm = forwardRef<PromoFormHandle, { onSaved: () => void }>(function 
         first_order_only: promo.first_order_only,
         max_account_age_days: promo.max_account_age_days === null ? '' : String(promo.max_account_age_days),
         is_active: promo.is_active,
+        auto_apply: promo.auto_apply ?? false,
       } : EMPTY);
       setError(null);
       dialogRef.current?.showModal();
@@ -88,6 +90,7 @@ const PromoForm = forwardRef<PromoFormHandle, { onSaved: () => void }>(function 
       first_order_only: draft.first_order_only,
       max_account_age_days: draft.max_account_age_days,
       is_active: draft.is_active,
+      auto_apply: draft.auto_apply,
     };
     try {
       const res = await apiFetch(
@@ -188,6 +191,11 @@ const PromoForm = forwardRef<PromoFormHandle, { onSaved: () => void }>(function 
             <div className="flex flex-col gap-3 justify-end pb-1">
               <Check checked={draft.first_order_only} onChange={(v) => set('first_order_only', v)} label="Лише на перше замовлення" />
               <Check checked={draft.is_active} onChange={(v) => set('is_active', v)} label="Увімкнено" />
+              <Check
+                checked={draft.auto_apply}
+                onChange={(v) => set('auto_apply', v)}
+                label="Застосовувати автоматично — клієнт не вводить код, знижка вже в ціні"
+              />
             </div>
           </div>
 

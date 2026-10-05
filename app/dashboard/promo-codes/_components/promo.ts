@@ -12,6 +12,8 @@ export type PromoCode = {
   first_order_only: boolean;
   max_account_age_days: number | null;
   is_active: boolean;
+  // Applied at checkout without being typed.
+  auto_apply?: boolean;
   createdAt: string;
   // Statistics. `used` counts towards the limit; `cancelled` freed its place.
   used: number;
@@ -69,6 +71,7 @@ export function conditions(p: PromoCode): string[] {
   if (p.usage_limit !== null) out.push(`ліміт ${p.usage_limit}`);
   if (p.first_order_only) out.push('лише перше замовлення');
   if (p.max_account_age_days) out.push(`акаунт до ${p.max_account_age_days} дн.`);
+  if (p.auto_apply) out.push('автоматично, без введення');
   return out;
 }
 
