@@ -4,6 +4,9 @@ import { apiFetch } from '../lib/api';
 // (gaderia_mobile_admin_back src/app-setting).
 export type AppSettings = {
   new_carousel_enabled: boolean;
+  // As 1.3.2; null when not set.
+  min_app_version: string | null;
+  latest_app_version: string | null;
 };
 
 export async function getAppSettings(): Promise<AppSettings> {
