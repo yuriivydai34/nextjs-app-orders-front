@@ -185,7 +185,7 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
                 </select>
               </Field>
               <Field label="Об'єм / вага" required hint="Однієї одиниці: 0,25">
-                <input name="measurement" type="number" step="0.01" min="0.01" required defaultValue={str(p?.measurement)} className={INPUT} />
+                <input name="measurement" type="number" step="any" min="0.01" required defaultValue={str(p?.measurement)} className={INPUT} />
               </Field>
               <Field label="Одиниця" required>
                 <select name="type_measurement" required defaultValue={p?.type_measurement ?? 'LITER'} className={INPUT}>
@@ -225,10 +225,10 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
                 <span className="font-normal text-gray-400"> — з цього рахується вартість Нової Пошти</span>
               </p>
               <div className="grid grid-cols-4 gap-2">
-                <input name="shipment_length" type="number" step="0.1" min="0.1" required placeholder="Д, см" title="Довжина, см" defaultValue={str(p?.shipment_length)} className={INPUT} />
-                <input name="shipment_width" type="number" step="0.1" min="0.1" required placeholder="Ш, см" title="Ширина, см" defaultValue={str(p?.shipment_width)} className={INPUT} />
-                <input name="shipment_height" type="number" step="0.1" min="0.1" required placeholder="В, см" title="Висота, см" defaultValue={str(p?.shipment_height)} className={INPUT} />
-                <input name="shipment_weight" type="number" step="0.1" min="0.1" required placeholder="кг" title="Вага, кг" defaultValue={str(p?.shipment_weight)} className={INPUT} />
+                <input name="shipment_length" type="number" step="any" min="0.01" required placeholder="Д, см" title="Довжина, см" defaultValue={str(p?.shipment_length)} className={INPUT} />
+                <input name="shipment_width" type="number" step="any" min="0.01" required placeholder="Ш, см" title="Ширина, см" defaultValue={str(p?.shipment_width)} className={INPUT} />
+                <input name="shipment_height" type="number" step="any" min="0.01" required placeholder="В, см" title="Висота, см" defaultValue={str(p?.shipment_height)} className={INPUT} />
+                <input name="shipment_weight" type="number" step="any" min="0.01" required placeholder="кг" title="Вага, кг" defaultValue={str(p?.shipment_weight)} className={INPUT} />
               </div>
               {mode === 'create' && (
                 <p className="text-xs text-gray-400 mt-1">Швидше — «Дублювати» схожий товар: габарити й вага скопіюються.</p>
