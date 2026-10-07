@@ -26,6 +26,8 @@ export type Product = {
   badge_color?: string | null;
   id_sort?: number | null;
   is_active?: boolean;
+  // In the app's "Новинки" carousel while it is switched on.
+  is_new?: boolean;
   description?: string | null;
   shipment_weight?: number | null;
   shipment_length?: number | null;
@@ -113,6 +115,7 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
       shipment_height: get('shipment_height'),
       shipment_weight: get('shipment_weight'),
       is_active: form.get('is_active') === 'on',
+      is_new: form.get('is_new') === 'on',
     };
     if (sub) data[sub.field] = get(sub.field);
 
@@ -294,6 +297,16 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
               />
               Показувати в застосунку
               <span className="text-xs text-gray-400">(зніміть, поки товар готується до запуску)</span>
+            </label>
+
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input
+                name="is_new" type="checkbox"
+                defaultChecked={mode === 'edit' ? p?.is_new === true : false}
+                className="w-4 h-4"
+              />
+              Новинка
+              <span className="text-xs text-gray-400">(у каруселі «Новинки» вгорі каталогу)</span>
             </label>
           </div>
 

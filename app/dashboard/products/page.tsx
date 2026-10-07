@@ -6,6 +6,7 @@ import Link from 'next/link';
 import ProductActions from './_components/product-actions';
 import ProductForm, { type Product, type ProductFormHandle } from './_components/product-form';
 import SortProductsModal from './_components/sort-products-modal';
+import NewCarouselSwitch from './_components/new-carousel-switch';
 import { apiFetch } from '../../lib/api';
 import { productTypeLabel } from '@/app/lib/product-types.ts';
 
@@ -68,6 +69,8 @@ function ProductsContent() {
         </div>
       </div>
 
+      <NewCarouselSwitch />
+
       {loading ? (
         <p className="text-sm text-gray-500 dark:text-gray-400">Завантаження…</p>
       ) : error ? (
@@ -118,6 +121,11 @@ function ProductsContent() {
                       {p.is_active === false && (
                         <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300" title="Не показується в застосунку">
                           Приховано
+                        </span>
+                      )}
+                      {p.is_new && (
+                        <span className="inline-block mt-1 ml-1 px-2 py-0.5 rounded-full text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" title="У каруселі «Новинки» в застосунку">
+                          Новинка
                         </span>
                       )}
                     </td>
