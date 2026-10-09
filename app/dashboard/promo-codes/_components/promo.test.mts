@@ -54,3 +54,18 @@ test('a saved date shows back as the same day in the form', () => {
   assert.equal(toDateInput(fromDateInput('2026-10-01', false)), '2026-10-01');
   assert.equal(toDateInput(null), '');
 });
+
+test('automatic discounts: only auto_apply codes, split by whether they work now', async () => {
+  const { autoDiscounts, audience } = await import('./promo.ts');
+  const codes = [
+    code({ id: 1, code: 'WELCOME10', auto_apply: true, first_order_only: true, max_account_age_days: 30 }),
+    code({ id: 2, code: 'OLD', auto_apply: true, ends_at: iso(now.getTime() - DAY) }),
+    code({ id: 3, code: 'TYPED', auto_apply: false }),
+    code({ id: 4, code: 'OFF', auto_apply: true, is_active: false }),
+  ];
+  const { working, idle } = autoDiscounts(codes, now);
+  assert.deepEqual(working.map((p) => p.code), ['WELCOME10']);
+  assert.deepEqual(idle.map((p) => p.code), ['OLD', 'OFF']);
+  assert.equal(audience(codes[0]), 'перше замовлення, акаунт до 30 дн.');
+  assert.equal(audience(codes[1]), 'усі клієнти');
+});

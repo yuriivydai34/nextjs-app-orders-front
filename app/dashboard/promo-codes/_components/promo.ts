@@ -97,3 +97,25 @@ export function fromDateInput(value: string, endOfDay: boolean): string | null {
   const date = endOfDay ? new Date(y, m - 1, d, 23, 59, 59, 999) : new Date(y, m - 1, d);
   return date.toISOString();
 }
+
+// Who an automatic code reaches, in words.
+export function audience(p: PromoCode): string {
+  const parts: string[] = [];
+  if (p.first_order_only) parts.push('перше замовлення');
+  if (p.max_account_age_days) parts.push(`акаунт до ${p.max_account_age_days} дн.`);
+  return parts.length ? parts.join(', ') : 'усі клієнти';
+}
+
+/**
+ * The codes the app applies on its own (auto_apply), split by whether they
+ * work right now. Answers "is anyone getting a discount without typing a
+ * code?" — the only automatic discount since the silent server-side
+ * WELCOME10 was removed (09.10.2026).
+ */
+export function autoDiscounts(codes: PromoCode[], now = new Date()): { working: PromoCode[]; idle: PromoCode[] } {
+  const auto = codes.filter((p) => p.auto_apply);
+  return {
+    working: auto.filter((p) => promoStatus(p, now).label === 'Діє'),
+    idle: auto.filter((p) => promoStatus(p, now).label !== 'Діє'),
+  };
+}

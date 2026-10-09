@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { apiFetch } from '../../lib/api';
 import PromoForm, { type PromoFormHandle } from './_components/promo-form';
 import {
-  ORDER_STATUS, conditions, formatDiscount, money, promoStatus,
+  ORDER_STATUS, audience, autoDiscounts, conditions, formatDiscount, money, promoStatus,
   type PromoCode, type Redemption,
 } from './_components/promo';
 
@@ -96,6 +96,8 @@ function PromoList() {
           <Tile label="Замовлень на суму" value={money(totals.orders)} hint="товари до знижки" />
         </div>
       )}
+
+      {codes && <AutoDiscounts codes={codes} />}
 
       {actionError && <p className="text-sm text-red-600 dark:text-red-400 mb-3">{actionError}</p>}
 
@@ -266,6 +268,40 @@ function PromoDetail({ id }: { id: number }) {
       )}
 
       <PromoForm ref={formRef} onSaved={() => setVersion((v) => v + 1)} />
+    </div>
+  );
+}
+
+// Answers "does anyone get a discount right now without typing a code?".
+// Automatic codes are the ones with "застосовувати автоматично": the app
+// (1.3.2+) asks the server for one at checkout and shows the lower price.
+function AutoDiscounts({ codes }: { codes: PromoCode[] }) {
+  const { working, idle } = autoDiscounts(codes);
+  return (
+    <div className="mb-6 p-4 bg-white dark:bg-gray-900 rounded-xl shadow-sm">
+      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Автоматичні знижки зараз</p>
+      {working.length === 0 ? (
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Ніхто не отримує знижку автоматично — лише ті, хто вводить код сам.
+        </p>
+      ) : (
+        <ul className="mt-2 flex flex-col gap-1">
+          {working.map((p) => (
+            <li key={p.id} className="text-sm text-gray-700 dark:text-gray-300">
+              <Link href={`?id=${p.id}`} className="font-mono font-medium text-blue-600 dark:text-blue-400 hover:underline">{p.code}</Link>
+              {' '}{formatDiscount(p)} — {audience(p)}
+            </li>
+          ))}
+        </ul>
+      )}
+      {idle.length > 0 && (
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+          Позначені «автоматично», але зараз не діють: {idle.map((p) => `${p.code} (${promoStatus(p).label.toLowerCase()})`).join(', ')}
+        </p>
+      )}
+      <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+        Знижку бачать клієнти із застосунком 1.3.2 і новіше, ще до оплати. Інших автоматичних знижок немає.
+      </p>
     </div>
   );
 }
