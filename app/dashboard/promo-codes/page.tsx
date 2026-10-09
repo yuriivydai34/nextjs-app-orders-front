@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { apiFetch } from '../../lib/api';
 import PromoForm, { type PromoFormHandle } from './_components/promo-form';
+import PromoFieldSwitch from './_components/promo-field-switch';
 import {
   ORDER_STATUS, audience, autoDiscounts, conditions, formatDiscount, money, promoStatus,
   type PromoCode, type Redemption,
@@ -96,6 +97,8 @@ function PromoList() {
           <Tile label="Замовлень на суму" value={money(totals.orders)} hint="товари до знижки" />
         </div>
       )}
+
+      <PromoFieldSwitch />
 
       {codes && <AutoDiscounts codes={codes} />}
 
@@ -302,11 +305,8 @@ function AutoDiscounts({ codes }: { codes: PromoCode[] }) {
       <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
         Знижку бачать клієнти із застосунком 1.3.2 і новіше, ще до оплати. Інших автоматичних знижок немає.
       </p>
-      {/* app-mobile 1.3.2: create_payment_screen.dart, promoFieldEnabled = false. */}
-      <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">
-        Поле для введення промокоду в застосунку поки приховане. Коди без галочки «застосовувати автоматично» зараз
-        ввести ніде — вони запрацюють, коли поле ввімкнуть у новій версії. Застосунок підписує автоматичну знижку як
-        «на перше замовлення», тож автоматичним варто робити лише привітальний код.
+      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+        Застосунок підписує автоматичну знижку як «на перше замовлення», тож автоматичним варто робити лише привітальний код.
       </p>
     </div>
   );

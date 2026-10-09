@@ -7,6 +7,8 @@ export type AppSettings = {
   // As 1.3.2; null when not set.
   min_app_version: string | null;
   latest_app_version: string | null;
+  // The promo code field at checkout, app 1.3.3+.
+  promo_field_enabled: boolean;
   // The Telegram bot. null: the bot's own text or .env value.
   bot_sale_text: string | null;
   bot_manager_username: string | null;
