@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
 import WooSyncButton, { SHOP_CUSTOMERS_REFRESH_EVENT } from '../../shop-customers/_components/woo-sync-button';
+import { describeSyncResult, type SyncResult } from '@/app/lib/sync-result.ts';
 
 // gaderia_mobile_admin_back GET /system/status.
 type SystemStatus = {
@@ -20,6 +21,7 @@ type SystemStatus = {
     cronEnabled: boolean;
     lastRunAt: string | null;
     lastError: { at: string; message: string } | null;
+    lastResult: SyncResult | null;
     imported: number;
   };
   admins: { id: number; email: string | null; full_name: string | null; createdAt: string | null }[];
@@ -89,7 +91,10 @@ export default function SystemStatusSections() {
         <Row label="База даних">
           {database.ok ? `працює · ${database.latencyMs} мс` : <span className="text-red-600">не відповідає{database.error ? `: ${database.error}` : ''}</span>}
         </Row>
-        <Row label="Синхронізація покупців з сайту" hint={`Щогодини. Імпортовано покупців: ${sync.imported.toLocaleString('uk-UA')}`}>
+        <Row
+          label="Синхронізація покупців з сайту"
+          hint={`Щогодини, лише замовлення, змінені з минулого разу. Покупців з сайту в базі: ${sync.imported.toLocaleString('uk-UA')} — зростає, лише коли замовляє нова людина`}
+        >
           {!sync.cronEnabled ? (
             <span className="text-orange-600">вимкнена (WOO_SYNC_CRON=off)</span>
           ) : sync.running ? (
@@ -100,6 +105,15 @@ export default function SystemStatusSections() {
             </span>
           )}
         </Row>
+        {sync.lastResult && (() => {
+          const d = describeSyncResult(sync.lastResult);
+          return (
+            <div className="px-5 py-3.5 text-xs text-gray-600 dark:text-gray-400">
+              <span className="text-gray-500">Останній запуск:</span> {d.summary}
+              {d.detail && <span className="block text-gray-400 mt-0.5">{d.detail}</span>}
+            </div>
+          );
+        })()}
         {sync.lastError && (
           <div className="px-5 py-3.5 text-xs text-red-600 dark:text-red-400">
             Остання помилка ({ago(sync.lastError.at, loadedAt)}): {sync.lastError.message}

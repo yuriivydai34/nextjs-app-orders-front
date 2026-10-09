@@ -2,14 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
-
-type SyncResult = {
-  ordersScanned: number;
-  contactsFound: number;
-  created: number;
-  updated: number;
-  linkedToExisting: number;
-};
+import { describeSyncResult, type SyncResult } from '@/app/lib/sync-result.ts';
 
 /** The table on this page listens for this and refetches. */
 export const SHOP_CUSTOMERS_REFRESH_EVENT = 'shop-customers:refresh';
@@ -70,10 +63,8 @@ export default function WooSyncButton() {
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.message ?? 'sync failed');
       }
-      const r: SyncResult = await res.json();
-      setMessage(
-        `Замовлень: ${r.ordersScanned} · нових: ${r.created} · оновлено: ${r.updated} · зіставлено: ${r.linkedToExisting}`,
-      );
+      const d = describeSyncResult((await res.json()) as SyncResult);
+      setMessage(d.detail ? `${d.summary}. ${d.detail}` : d.summary);
       // Refetch the table in place, so the summary above stays readable.
       window.dispatchEvent(new CustomEvent(SHOP_CUSTOMERS_REFRESH_EVENT));
     } catch (err) {
