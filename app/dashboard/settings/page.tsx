@@ -1,5 +1,6 @@
 import AppVersions from './_components/app-versions';
 import SystemStatusSections from './_components/system-status';
+import BotSettings from './_components/bot-settings';
 
 export const metadata = { title: 'Налаштування' };
 
@@ -13,6 +14,8 @@ export default function SettingsPage() {
       <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Налаштування</h2>
 
       <SystemStatusSections />
+
+      <BotSettings />
 
       <AppVersions />
     </div>

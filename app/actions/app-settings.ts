@@ -7,6 +7,11 @@ export type AppSettings = {
   // As 1.3.2; null when not set.
   min_app_version: string | null;
   latest_app_version: string | null;
+  // The Telegram bot. null: the bot's own text or .env value.
+  bot_sale_text: string | null;
+  bot_manager_username: string | null;
+  bot_manager_work_hours: string | null;
+  bot_notify_enabled: boolean;
 };
 
 export async function getAppSettings(): Promise<AppSettings> {
