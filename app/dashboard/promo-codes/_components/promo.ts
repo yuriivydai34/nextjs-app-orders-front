@@ -28,6 +28,8 @@ export type Redemption = {
   source: 'APP' | 'WOO';
   payment_id: number | null;
   external_order_id: string | null;
+  // The site's order was cancelled or refunded: the use freed its place.
+  released_at?: string | null;
   order_amount: number;
   discount_amount: number;
   createdAt: string;

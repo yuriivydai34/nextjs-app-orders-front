@@ -237,7 +237,8 @@ function PromoDetail({ id }: { id: number }) {
             </thead>
             <tbody>
               {promo.redemptions.map((r) => {
-                const cancelled = r.status === 'CANCELED';
+                // Freed its place: an app order cancelled, or a site order released.
+                const cancelled = r.status === 'CANCELED' || Boolean(r.released_at);
                 return (
                   <tr key={r.id} className={cancelled ? 'opacity-50' : ''}>
                     <td className="py-3 px-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
@@ -253,6 +254,7 @@ function PromoDetail({ id }: { id: number }) {
                     <td className="py-3 px-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
                       {r.source === 'WOO' ? `Сайт №${r.external_order_id ?? '—'}` : r.payment_id !== null ? `№${r.payment_id}` : '—'}
                       {r.status && <span className="ml-2 text-xs text-gray-400">{ORDER_STATUS[r.status] ?? r.status}</span>}
+                      {r.released_at && <span className="ml-2 text-xs text-gray-400">скасовано на сайті</span>}
                     </td>
                     <td className="py-3 px-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{money(r.order_amount)}</td>
                     <td className="py-3 px-3 text-sm text-green-700 dark:text-green-400 whitespace-nowrap">−{money(r.discount_amount)}</td>
@@ -265,7 +267,7 @@ function PromoDetail({ id }: { id: number }) {
             </tbody>
           </table>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
-            «До сплати» — з доставкою, якщо її оплачували разом із замовленням. Скасовані замовлення приглушені й не рахуються в ліміт і статистику.
+            «До сплати» — з доставкою, якщо її оплачували разом із замовленням. Скасовані замовлення (у застосунку чи на сайті) приглушені й не рахуються в ліміт і статистику.
           </p>
         </div>
       )}
