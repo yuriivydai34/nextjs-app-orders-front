@@ -2,6 +2,7 @@
 
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { createProduct, updateProduct } from '@/app/actions/products';
+import DescriptionEditor from './description-editor';
 import { MEASUREMENT_TYPES, PACKAGING_TYPES, PRODUCT_TYPES, SUBTYPE } from '@/app/lib/product-types.ts';
 import { BADGE_MAX_LENGTH, BADGE_PRESET, DEFAULT_BADGE_COLOR } from '@/app/lib/product-badges';
 
@@ -313,14 +314,10 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
           {/* The description is what the app shows under the product: often
               several paragraphs, so it gets the full width and room to grow. */}
           <div className="md:col-span-2">
-            <Field label="Опис" hint="Так, як побачить клієнт у застосунку; порожній рядок — новий абзац">
-              <textarea
-                name="description"
-                rows={10}
-                defaultValue={p?.description ?? ''}
-                className={`${INPUT} h-auto min-h-40 py-2 leading-relaxed resize-y`}
-              />
-            </Field>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Опис</span>
+              <DescriptionEditor defaultValue={p?.description ?? ''} />
+            </div>
           </div>
         </div>
 
