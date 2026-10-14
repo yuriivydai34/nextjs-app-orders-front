@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
 import { orderStats } from './order-stats';
+import { inactiveQuery, type InactiveRange } from './inactive-range';
 
 type Row = Record<string, unknown>;
 type Seen = { value: string; firstSeen: string | null; lastSeen: string | null };
@@ -74,13 +75,13 @@ function toCsv(rows: Row[]): string {
 }
 
 export default function ExportShopCustomersButton({
-  search, sortBy, sortOrder, inactiveDays,
+  search, sortBy, sortOrder, inactive,
 }: {
   search?: string;
   sortBy?: string;
   sortOrder?: string;
   // "Not bought for N days": the file holds exactly the list on screen.
-  inactiveDays?: number;
+  inactive?: InactiveRange;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,7 +94,7 @@ export default function ExportShopCustomersButton({
     // Same order as on screen, so the file opens with the regulars on top.
     if (sortBy) url.searchParams.set('sortBy', sortBy);
     if (sortOrder) url.searchParams.set('sortOrder', sortOrder);
-    if (inactiveDays) url.searchParams.set('inactiveDays', String(inactiveDays));
+    for (const [k, v] of Object.entries(inactiveQuery(inactive))) url.searchParams.set(k, v);
 
     const res = await apiFetch(url.toString());
     if (!res.ok) throw new Error('Failed to fetch customers');
@@ -117,7 +118,7 @@ export default function ExportShopCustomersButton({
       const href = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = href;
-      const suffix = inactiveDays ? `-not-bought-${inactiveDays}d` : '';
+      const suffix = inactive ? `-not-bought-${inactive.key.replace(/-$/, 'plus')}d` : '';
       link.download = `shop-customers${suffix}-${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(link);
       link.click();

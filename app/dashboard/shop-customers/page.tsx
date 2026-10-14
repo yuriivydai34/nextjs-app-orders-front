@@ -9,7 +9,8 @@ import ExportShopCustomersButton from './_components/export-shop-customers-butto
 import WooSyncButton, { SHOP_CUSTOMERS_REFRESH_EVENT } from './_components/woo-sync-button';
 import ShopCustomersTable, { ShopCustomer } from './_components/shop-customers-table';
 import CustomerSort, { DEFAULT_SORT, SORTS } from './_components/customer-sort';
-import InactiveFilter, { readInactiveDays } from './_components/inactive-filter';
+import InactiveFilter from './_components/inactive-filter';
+import { inactiveQuery, readInactiveRange } from './_components/inactive-range';
 
 type Response = {
   data: ShopCustomer[];
@@ -27,7 +28,7 @@ function ShopCustomersContent() {
   const search = searchParams.get('search') ?? '';
   const sortKey = SORTS[searchParams.get('sort') ?? ''] ? searchParams.get('sort')! : DEFAULT_SORT;
   const sort = SORTS[sortKey];
-  const inactiveDays = readInactiveDays(searchParams.get('inactive'));
+  const inactive = readInactiveRange(searchParams.get('inactive'));
 
   const [result, setResult] = useState<Response | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +48,7 @@ function ShopCustomersContent() {
     if (search) qs.set('search', search);
     qs.set('sortBy', sort.sortBy);
     qs.set('sortOrder', sort.sortOrder);
-    if (inactiveDays) qs.set('inactiveDays', String(inactiveDays));
+    for (const [k, v] of Object.entries(inactiveQuery(inactive))) qs.set(k, v);
     apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/customers?${qs.toString()}`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch customers');
@@ -56,7 +57,7 @@ function ShopCustomersContent() {
       .then((data) => setResult(data))
       .catch(() => setError('Не вдалося завантажити покупців.'))
       .finally(() => setLoading(false));
-  }, [page, search, sort, inactiveDays, reloadKey]);
+  }, [page, search, sort, inactive, reloadKey]);
 
   const customers = result?.data ?? [];
   const total = result?.total ?? 0;
@@ -67,9 +68,9 @@ function ShopCustomersContent() {
     const qs = new URLSearchParams({ page: String(p) });
     if (search) qs.set('search', search);
     if (sortKey !== DEFAULT_SORT) qs.set('sort', sortKey);
-    if (inactiveDays) qs.set('inactive', String(inactiveDays));
+    if (inactive) qs.set('inactive', inactive.key);
     return `?${qs.toString()}`;
-  }, [search, sortKey, inactiveDays]);
+  }, [search, sortKey, inactive]);
 
   // A page number left over from a wider result set would show an empty table
   // even though there are matches. Fall back to the first page.
@@ -86,9 +87,9 @@ function ShopCustomersContent() {
       </h2>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
         Люди із замовлень на сайті. Це довідник контактів — вони не мають входу в застосунок.
-        {inactiveDays && (
+        {inactive && (
           <span className="block mt-1 text-orange-700 dark:text-orange-300">
-            Лише ті, хто вже купував, але не робив виконаного замовлення понад {inactiveDays} днів. Експорт .csv дасть саме цей список.
+            Ті, чия остання виконана покупка була {inactive.label} тому. Хто ніколи не купував — не входить. Експорт .csv дасть саме цей список.
           </span>
         )}
       </p>
@@ -97,11 +98,11 @@ function ShopCustomersContent() {
         <div className="flex flex-wrap items-center gap-2 w-full max-w-2xl">
           <CustomerSearch />
           <CustomerSort value={sortKey} />
-          <InactiveFilter value={inactiveDays} />
+          <InactiveFilter value={inactive} />
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <WooSyncButton />
-          <ExportShopCustomersButton search={search} sortBy={sort.sortBy} sortOrder={sort.sortOrder} inactiveDays={inactiveDays} />
+          <ExportShopCustomersButton search={search} sortBy={sort.sortBy} sortOrder={sort.sortOrder} inactive={inactive} />
         </div>
       </div>
 
@@ -113,8 +114,8 @@ function ShopCustomersContent() {
         <p className="text-sm text-gray-500 dark:text-gray-400">
           {search
             ? `За запитом «${search}» нічого не знайдено.`
-            : inactiveDays
-              ? `Немає покупців, які не купували понад ${inactiveDays} днів.`
+            : inactive
+              ? `Немає покупців, які востаннє купували ${inactive.label} тому.`
               : 'Покупців ще не імпортовано — натисніть «Синхронізувати сайт».'}
         </p>
       ) : (
