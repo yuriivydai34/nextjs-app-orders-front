@@ -25,6 +25,8 @@ type SystemStatus = {
     imported: number;
   };
   admins: { id: number; email: string | null; full_name: string | null; createdAt: string | null }[];
+  // Opened the app in the last 30 days, by version, newest first.
+  appVersions?: { version: string; accounts: number }[];
 };
 
 const STATUS: Record<SystemStatus['health']['status'], { label: string; className: string }> = {
@@ -124,6 +126,8 @@ export default function SystemStatusSections() {
         </div>
       </section>
 
+      <AppVersionShare versions={status.appVersions ?? []} />
+
       <section className={SECTION}>
         <div className="px-5 py-4">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Доступ до адмінки</h3>
@@ -143,6 +147,38 @@ export default function SystemStatusSections() {
         )}
       </section>
     </>
+  );
+}
+
+// How many people opened which version of the app lately: for example, who
+// already has the promo code field (1.3.3). Counted from signed-in requests,
+// so people who only browse without an account are not in it.
+function AppVersionShare({ versions }: { versions: { version: string; accounts: number }[] }) {
+  const total = versions.reduce((sum, v) => sum + v.accounts, 0);
+  return (
+    <section className={SECTION}>
+      <div className="px-5 py-4">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Версії застосунку у клієнтів</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+          Хто відкривав застосунок за 30 днів, увійшовши в акаунт. Рахується з 1.3.2 і новіших — старіші версію не надсилають.
+        </p>
+      </div>
+      {total === 0 ? (
+        <p className="px-5 py-3.5 text-sm text-gray-500 dark:text-gray-400">Ще немає даних — з’являться, щойно клієнти відкриють застосунок.</p>
+      ) : (
+        versions.map((v) => (
+          <div key={v.version} className="px-5 py-3 flex items-center gap-4">
+            <span className="w-16 font-mono text-sm text-gray-900 dark:text-gray-100">{v.version}</span>
+            <div className="flex-1 h-2 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+              <div className="h-full bg-green-600" style={{ width: `${Math.max(2, Math.round((v.accounts / total) * 100))}%` }} />
+            </div>
+            <span className="w-28 text-right text-sm text-gray-700 dark:text-gray-300">
+              {v.accounts.toLocaleString('uk-UA')} · {Math.round((v.accounts / total) * 100)}%
+            </span>
+          </div>
+        ))
+      )}
+    </section>
   );
 }
 

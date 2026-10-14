@@ -22,6 +22,8 @@ type Customer = {
   region?: string | null;
   settlement?: string | null;
   address?: string | null;
+  app_version?: string | null;
+  app_version_seen_at?: string | null;
   [key: string]: unknown;
 };
 
@@ -152,6 +154,14 @@ function CustomersContent() {
                         )}
                         {c.number && (
                           <span className="text-xs text-gray-500 dark:text-gray-400">{c.number}</span>
+                        )}
+                        {c.app_version && (
+                          <span
+                            className="text-xs text-gray-400 dark:text-gray-500"
+                            title={c.app_version_seen_at ? `Остання активність: ${new Date(c.app_version_seen_at).toLocaleString('uk-UA')}` : undefined}
+                          >
+                            застосунок {c.app_version}
+                          </span>
                         )}
                         {!c.full_name && !c.email && !c.number && (
                           <span className="text-gray-300 dark:text-gray-600">—</span>
