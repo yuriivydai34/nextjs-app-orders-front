@@ -72,6 +72,17 @@ function ShopCustomersContent() {
     return `?${qs.toString()}`;
   }, [search, sortKey, inactive]);
 
+  // An inactive value this version does not know (a bookmark from the first
+  // version, ?inactive=90) used to be ignored silently: the list showed
+  // everyone while the address still said otherwise. Drop it instead.
+  const rawInactive = searchParams.get('inactive');
+  useEffect(() => {
+    if (!rawInactive || inactive) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('inactive');
+    router.replace(`?${params.toString()}`);
+  }, [rawInactive, inactive, searchParams, router]);
+
   // A page number left over from a wider result set would show an empty table
   // even though there are matches. Fall back to the first page.
   useEffect(() => {
