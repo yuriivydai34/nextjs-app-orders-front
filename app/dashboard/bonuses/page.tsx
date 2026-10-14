@@ -18,6 +18,7 @@ type Row = {
 type Entry = {
   id: number; amount: number; type: string; createdAt: string;
   payment_id: number | null; order_amount: number | null; order_status: string | null;
+  source?: string; external_order_id?: string | null;
 };
 
 const SORTS: Record<string, { label: string; sortBy: string; sortOrder: 'ASC' | 'DESC' }> = {
@@ -91,7 +92,7 @@ function List() {
     <div>
       <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">Бонуси</h2>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-        1 бонус за кожну гривню замовлення, оплаченого онлайн у застосунку. Поки лише нарахування — витрачати бонуси ще не можна.
+        1 бонус за кожну гривню товарів: замовлення, оплачені онлайн у застосунку, і виконані замовлення на сайті, оформлені з входом в акаунт. Поки лише нарахування — витрачати бонуси ще не можна.
       </p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -192,9 +193,9 @@ function History({ accountId }: { accountId: number }) {
                 {data.entries.map((e) => (
                   <tr key={e.id}>
                     <td className="py-3 px-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">{when(e.createdAt)}</td>
-                    <td className="py-3 px-3 text-sm text-gray-700 dark:text-gray-300">{e.type === 'ACCRUE' ? 'Нарахування' : e.type === 'REDEEM' ? 'Списання' : e.type}</td>
+                    <td className="py-3 px-3 text-sm text-gray-700 dark:text-gray-300">{e.type === 'ACCRUE' ? 'Нарахування' : e.type === 'REDEEM' ? 'Списання' : e.type === 'REVERSE' ? 'Відкликано (повернення)' : e.type}</td>
                     <td className="py-3 px-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                      {e.payment_id ? `№${e.payment_id}` : '—'}
+                      {e.source === 'WOO' ? `Сайт №${e.external_order_id ?? '—'}` : e.payment_id ? `№${e.payment_id}` : '—'}
                       {e.order_status && <span className="ml-2 text-xs text-gray-400">{ORDER_STATUS[e.order_status] ?? e.order_status}</span>}
                     </td>
                     <td className="py-3 px-3 text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">{e.order_amount != null ? `${num(Number(e.order_amount))} грн` : '—'}</td>
