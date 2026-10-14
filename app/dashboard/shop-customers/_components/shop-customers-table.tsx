@@ -115,6 +115,11 @@ export default function ShopCustomersTable({ rows }: { rows: ShopCustomer[] }) {
 
                 <td className="py-3 px-3 text-xs text-gray-600 dark:text-gray-400 whitespace-nowrap">
                   {shortDate(c.first_order_at)} – {shortDate(c.last_order_at)}
+                  {stats.lastCompletedAt && (
+                    <span className="block text-gray-400 mt-0.5" title="Останнє виконане замовлення">
+                      купував {shortDate(stats.lastCompletedAt)}
+                    </span>
+                  )}
                 </td>
 
                 <td className="py-3 px-3 whitespace-nowrap">

@@ -9,6 +9,7 @@ export const SORTS: Record<string, { label: string; sortBy: string; sortOrder: '
   cancelled:   { label: 'Найбільше скасувань', sortBy: 'cancelled',   sortOrder: 'DESC' },
   spent:       { label: 'Найбільша сума',      sortBy: 'spent',       sortOrder: 'DESC' },
   last_order:  { label: 'Нещодавно замовляли', sortBy: 'last_order',  sortOrder: 'DESC' },
+  last_completed: { label: 'Найдовше не купували', sortBy: 'last_completed', sortOrder: 'ASC' },
   first_order: { label: 'Найдавніші покупці',  sortBy: 'first_order', sortOrder: 'ASC' },
   id:          { label: 'За ID',               sortBy: 'id',          sortOrder: 'ASC' },
 };

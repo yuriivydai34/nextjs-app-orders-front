@@ -14,16 +14,20 @@ export const STATUS_LABELS: Record<string, string> = {
   'checkout-draft': 'чернетка',
 };
 
-type Order = { status?: string | null; total?: string | null };
+type Order = { status?: string | null; total?: string | null; date?: string | null };
 
 export function orderStats(orders: Order[] | undefined) {
   let completed = 0;
   let cancelled = 0;
   let completedSum = 0;
+  // When they last bought: the newest completed order (GMT, as the shop
+  // stores it). The API filters "not bought for N days" on the same thing.
+  let lastCompletedAt: string | null = null;
   for (const o of orders ?? []) {
     if (COMPLETED.includes(o.status ?? '')) {
       completed++;
       completedSum += Number(o.total) || 0;
+      if (o.date && (!lastCompletedAt || o.date > lastCompletedAt)) lastCompletedAt = o.date;
     } else if (CANCELLED.includes(o.status ?? '')) {
       cancelled++;
     }
@@ -35,5 +39,6 @@ export function orderStats(orders: Order[] | undefined) {
     cancelled,
     inProgress: total - completed - cancelled,
     completedSum: Number(completedSum.toFixed(2)),
+    lastCompletedAt,
   };
 }

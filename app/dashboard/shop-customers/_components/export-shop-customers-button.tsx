@@ -34,6 +34,7 @@ const COLUMNS: { label: string; get: (row: Row) => unknown }[] = [
   { label: 'Сума (усі)',    get: (r) => data(r).totalSpent ?? 0 },
   { label: 'Перше замовлення',   get: (r) => r.first_order_at },
   { label: 'Останнє замовлення', get: (r) => r.last_order_at },
+  { label: 'Остання покупка (виконане)', get: (r) => stats(r).lastCompletedAt ?? '' },
   { label: 'Коментарі',     get: (r) => list(r, 'notes').join(' / ') },
 ];
 
@@ -73,11 +74,13 @@ function toCsv(rows: Row[]): string {
 }
 
 export default function ExportShopCustomersButton({
-  search, sortBy, sortOrder,
+  search, sortBy, sortOrder, inactiveDays,
 }: {
   search?: string;
   sortBy?: string;
   sortOrder?: string;
+  // "Not bought for N days": the file holds exactly the list on screen.
+  inactiveDays?: number;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -90,6 +93,7 @@ export default function ExportShopCustomersButton({
     // Same order as on screen, so the file opens with the regulars on top.
     if (sortBy) url.searchParams.set('sortBy', sortBy);
     if (sortOrder) url.searchParams.set('sortOrder', sortOrder);
+    if (inactiveDays) url.searchParams.set('inactiveDays', String(inactiveDays));
 
     const res = await apiFetch(url.toString());
     if (!res.ok) throw new Error('Failed to fetch customers');
@@ -113,7 +117,8 @@ export default function ExportShopCustomersButton({
       const href = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = href;
-      link.download = `shop-customers-${new Date().toISOString().slice(0, 10)}.csv`;
+      const suffix = inactiveDays ? `-not-bought-${inactiveDays}d` : '';
+      link.download = `shop-customers${suffix}-${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(link);
       link.click();
       link.remove();
