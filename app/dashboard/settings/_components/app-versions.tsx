@@ -48,7 +48,7 @@ export default function AppVersions() {
       <div className="px-5 py-4">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Версія застосунку</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-          Застосунок перевіряє це при запуску. Формат — 1.3.2. Порожнє поле — без перевірки.
+          Застосунок перевіряє це при запуску. Три числа через крапку, наприклад 1.3.4. Порожнє поле — без перевірки.
         </p>
       </div>
       <form onSubmit={save}>
@@ -61,6 +61,13 @@ export default function AppVersions() {
           </span>
           <input value={min} onChange={(e) => setMin(e.target.value)} placeholder="—" disabled={!loaded} className={input} />
         </label>
+        {/* Set by mistake, this locks everyone on an older version out. */}
+        {min.trim() && (
+          <p className="px-5 pb-3 -mt-1 text-xs text-red-600 dark:text-red-400">
+            Усі, у кого версія старіша за {min.trim()}, не зможуть користуватися застосунком, поки не оновляться. Для звичайного
+            оновлення досить рекомендованої версії, а мінімальну лиште порожньою.
+          </p>
+        )}
         <label className="px-5 py-3.5 flex items-center justify-between gap-4">
           <span>
             <span className="block text-sm font-medium text-gray-900 dark:text-gray-100">Рекомендована версія</span>
