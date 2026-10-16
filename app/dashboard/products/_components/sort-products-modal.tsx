@@ -9,7 +9,13 @@ type Product = {
   header: string;
   picture: string | null;
   id_sort?: number | null;
+  is_active?: boolean;
 };
+
+// The app lays the catalog out two cards to a row, left to right, row by row
+// (app-mobile catalog_screen.dart, a Wrap of half-width cards). The dialog
+// uses the same grid, so the first row here is the first row on the phone.
+const COLUMNS = 2;
 
 export default function SortProductsModal({ onSaved }: { onSaved: () => void }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -87,11 +93,14 @@ export default function SortProductsModal({ onSaved }: { onSaved: () => void }) 
 
       <dialog
         ref={dialogRef}
-        className="w-full max-w-md rounded-2xl shadow-2xl bg-white dark:bg-gray-900 p-0 backdrop:bg-black/40"
+        className="w-full max-w-xl rounded-2xl shadow-2xl bg-white dark:bg-gray-900 p-0 backdrop:bg-black/40"
         onClick={(e) => { if (e.target === dialogRef.current) close(); }}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Сортування товарів</h3>
+          <div>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">Сортування товарів</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Як у застосунку: по {COLUMNS} в ряд, зліва направо. Перетягніть картку на нове місце.</p>
+          </div>
           <button
             onClick={close}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none"
@@ -100,35 +109,39 @@ export default function SortProductsModal({ onSaved }: { onSaved: () => void }) 
           </button>
         </div>
 
-        <div className="px-6 py-4 max-h-[60vh] overflow-y-auto space-y-1">
+        <div className="px-6 py-4 max-h-[65vh] overflow-y-auto">
           {fetching ? (
             <p className="text-sm text-gray-500 dark:text-gray-400 py-4 text-center">Завантаження…</p>
-          ) : items.map((p, i) => (
-            <div
-              key={p.id}
-              draggable
-              onDragStart={() => onDragStart(i)}
-              onDragOver={(e) => onDragOver(e, i)}
-              onDrop={onDrop}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-800 cursor-grab active:cursor-grabbing select-none hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <span className="text-gray-400 dark:text-gray-500 text-sm w-5 shrink-0">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-                  <circle cx="4" cy="3" r="1.2"/><circle cx="10" cy="3" r="1.2"/>
-                  <circle cx="4" cy="7" r="1.2"/><circle cx="10" cy="7" r="1.2"/>
-                  <circle cx="4" cy="11" r="1.2"/><circle cx="10" cy="11" r="1.2"/>
-                </svg>
-              </span>
-              {p.picture ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.picture} alt={p.header} width={36} height={36} className="rounded-lg object-contain bg-white dark:bg-gray-900 shrink-0" style={{ width: 36, height: 36 }} />
-              ) : (
-                <div className="w-9 h-9 rounded-lg bg-gray-200 dark:bg-gray-700 shrink-0" />
-              )}
-              <span className="text-sm text-gray-800 dark:text-gray-200 truncate flex-1">{p.header}</span>
-              <span className="text-xs text-gray-400 shrink-0">{i + 1}</span>
+          ) : (
+            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${COLUMNS}, minmax(0, 1fr))` }}>
+              {items.map((p, i) => (
+                <div
+                  key={p.id}
+                  draggable
+                  onDragStart={() => onDragStart(i)}
+                  onDragOver={(e) => onDragOver(e, i)}
+                  onDrop={onDrop}
+                  title={p.is_active === false ? 'Прихований — у застосунку не показується' : undefined}
+                  className={`relative flex flex-col items-center gap-1.5 p-2 rounded-xl bg-gray-50 dark:bg-gray-800 cursor-grab active:cursor-grabbing select-none hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                    p.is_active === false ? 'opacity-40' : ''
+                  }`}
+                >
+                  <span className="absolute top-1.5 left-2 text-[11px] text-gray-400">
+                    {i + 1}
+                    <span className="ml-1 text-gray-300 dark:text-gray-600">· ряд {Math.floor(i / COLUMNS) + 1}</span>
+                  </span>
+                  {p.picture ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.picture} alt={p.header} className="mt-4 w-24 h-24 rounded-lg object-contain bg-white dark:bg-gray-900" />
+                  ) : (
+                    <div className="mt-4 w-24 h-24 rounded-lg bg-gray-200 dark:bg-gray-700" />
+                  )}
+                  <span className="text-xs text-center text-gray-800 dark:text-gray-200 line-clamp-2 leading-snug">{p.header}</span>
+                  {p.is_active === false && <span className="text-[10px] text-gray-500">Приховано</span>}
+                </div>
+              ))}
             </div>
-          ))}
+          )}
         </div>
 
         {error && (

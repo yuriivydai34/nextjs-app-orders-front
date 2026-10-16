@@ -2,6 +2,13 @@
 @config "../tailwind.config.js";
 @import "@heroui/styles";
 
+/* Tailwind's preflight zeroes every margin, and the browser centres a modal
+   <dialog> with margin: auto - so every dialog in the panel opened in the
+   top-left corner. Put the centring back for all of them. */
+dialog:modal {
+  margin: auto;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
