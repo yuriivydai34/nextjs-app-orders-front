@@ -1,5 +1,9 @@
 import { apiFetch } from '../lib/api';
 
+// A box rule for juices by the bottle: bottles of `measurement` litres go in
+// boxes of `n`; `msg` has {N} for how many are missing.
+export type PackRule = { measurement: number; n: number; label: string; msg: string; enabled: boolean };
+
 // Switches in the app that the panel turns on and off without a release
 // (gaderia_mobile_admin_back src/app-setting).
 export type AppSettings = {
@@ -9,6 +13,10 @@ export type AppSettings = {
   latest_app_version: string | null;
   // The promo code field at checkout, app 1.3.3+.
   promo_field_enabled: boolean;
+  // Juices by the bottle (admin back src/app-setting/own-sets.ts).
+  own_sets_mode: 'off' | 'testers' | 'on';
+  own_sets_testers: number[];
+  pack_rules: PackRule[];
   // The Telegram bot. null: the bot's own text or .env value.
   bot_sale_text: string | null;
   bot_manager_username: string | null;

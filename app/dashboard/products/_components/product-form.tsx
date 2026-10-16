@@ -29,6 +29,8 @@ export type Product = {
   is_active?: boolean;
   // In the app's "Новинки" carousel while it is switched on.
   is_new?: boolean;
+  // Juices by the bottle: a bottle, a ready box, or neither (empty).
+  own_sets_role?: 'single' | 'pack' | null;
   description?: string | null;
   shipment_weight?: number | null;
   shipment_length?: number | null;
@@ -117,6 +119,7 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
       shipment_weight: get('shipment_weight'),
       is_active: form.get('is_active') === 'on',
       is_new: form.get('is_new') === 'on',
+      own_sets_role: get('own_sets_role'),
     };
     if (sub) data[sub.field] = get(sub.field);
 
@@ -308,6 +311,20 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
               />
               Новинка
               <span className="text-xs text-gray-400">(у каруселі «Новинки» вгорі каталогу)</span>
+            </label>
+
+            <label className="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-300">
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Поштучний продаж</span>
+              <select
+                name="own_sets_role"
+                defaultValue={p?.own_sets_role ?? ''}
+                className="h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm"
+              >
+                <option value="">Не стосується (оцет, яблука, мед, дегустаційні)</option>
+                <option value="single">Пляшка — продається поштучно</option>
+                <option value="pack">Коробка — ховається, коли продаємо поштучно</option>
+              </select>
+              <span className="text-xs text-gray-400">Режим — у «Налаштуваннях», блок «Соки поштучно»</span>
             </label>
           </div>
 
