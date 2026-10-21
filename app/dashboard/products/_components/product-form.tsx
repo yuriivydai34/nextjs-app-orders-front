@@ -324,7 +324,7 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
                 <option value="single">Пляшка — продається поштучно</option>
                 <option value="pack">Коробка — ховається, коли продаємо поштучно</option>
               </select>
-              <span className="text-xs text-gray-400">Режим — у «Налаштуваннях», блок «Соки поштучно»</span>
+              <span className="text-xs text-gray-400">Режим і мікси — на сторінці «Поштучно»</span>
             </label>
           </div>
 
