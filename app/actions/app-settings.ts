@@ -4,6 +4,16 @@ import { apiFetch } from '../lib/api';
 // boxes of `n`; `msg` has {N} for how many are missing.
 export type PackRule = { measurement: number; n: number; label: string; msg: string; enabled: boolean };
 
+// A ready-made mix: one tap puts a whole box of these bottles in the app's
+// cart. Flavours are juice codes (JUICE_TYPES); together they fill one box.
+export type PackMix = {
+  id: string;
+  name: string;
+  measurement: number;
+  items: { juice: string; qty: number }[];
+  enabled: boolean;
+};
+
 // Switches in the app that the panel turns on and off without a release
 // (gaderia_mobile_admin_back src/app-setting).
 export type AppSettings = {
@@ -17,6 +27,7 @@ export type AppSettings = {
   own_sets_mode: 'off' | 'testers' | 'on';
   own_sets_testers: number[];
   pack_rules: PackRule[];
+  pack_mixes: PackMix[];
   // The Telegram bot. null: the bot's own text or .env value.
   bot_sale_text: string | null;
   bot_manager_username: string | null;

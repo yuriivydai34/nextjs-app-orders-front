@@ -2,6 +2,7 @@ import AppVersions from './_components/app-versions';
 import SystemStatusSections from './_components/system-status';
 import BotSettings from './_components/bot-settings';
 import OwnSetsSettings from './_components/own-sets-settings';
+import PackMixesSettings from './_components/pack-mixes-settings';
 
 export const metadata = { title: 'Налаштування' };
 
@@ -17,6 +18,8 @@ export default function SettingsPage() {
       <SystemStatusSections />
 
       <OwnSetsSettings />
+
+      <PackMixesSettings />
 
       <BotSettings />
 
