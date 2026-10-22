@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
 import { orderStats } from './order-stats';
 import { inactiveQuery, type InactiveRange } from './inactive-range';
+import { emailList } from './email-list';
 
 type Row = Record<string, unknown>;
 type Seen = { value: string; firstSeen: string | null; lastSeen: string | null };
@@ -74,6 +75,16 @@ function toCsv(rows: Row[]): string {
   return lines.join('\r\n');
 }
 
+// One row per address, then phone-only rows for people without one: for a
+// mailing service, or calls and Viber where there is no email.
+function toEmailCsv(rows: Row[]): string {
+  const lines = [['Email', "Ім'я", 'Телефон', 'Виконаних замовлень', 'Остання покупка'].map(cell).join(SEP)];
+  for (const r of emailList(rows)) {
+    lines.push([r.email, r.name, r.phone, r.completed, r.lastPurchase].map(cell).join(SEP));
+  }
+  return lines.join('\r\n');
+}
+
 export default function ExportShopCustomersButton({
   search, sortBy, sortOrder, inactive,
 }: {
@@ -83,7 +94,7 @@ export default function ExportShopCustomersButton({
   // "Not bought for N days": the file holds exactly the list on screen.
   inactive?: InactiveRange;
 }) {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<'all' | 'emails' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function fetchPage(page: number): Promise<{ data: Row[]; total: number }> {
@@ -102,8 +113,8 @@ export default function ExportShopCustomersButton({
     return { data: json.data ?? [], total: json.total ?? 0 };
   }
 
-  async function handleExport() {
-    setLoading(true);
+  async function handleExport(kind: 'all' | 'emails') {
+    setLoading(kind);
     setError(null);
     try {
       const first = await fetchPage(1);
@@ -114,12 +125,13 @@ export default function ExportShopCustomersButton({
       }
 
       // BOM so Excel detects UTF-8 and does not mangle Cyrillic.
-      const blob = new Blob(['﻿' + toCsv(rows)], { type: 'text/csv;charset=utf-8;' });
+      const csv = kind === 'emails' ? toEmailCsv(rows) : toCsv(rows);
+      const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
       const href = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = href;
       const suffix = inactive ? `-not-bought-${inactive.key.replace(/-$/, 'plus')}d` : '';
-      link.download = `shop-customers${suffix}-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.download = `shop-${kind === 'emails' ? 'emails' : 'customers'}${suffix}-${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -127,7 +139,7 @@ export default function ExportShopCustomersButton({
     } catch {
       setError('Помилка');
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   }
 
@@ -135,13 +147,25 @@ export default function ExportShopCustomersButton({
     <div className="flex items-center gap-2">
       {error && <span className="text-xs text-red-500">{error}</span>}
       <button
-        onClick={handleExport}
-        disabled={loading}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors whitespace-nowrap"
+        onClick={() => handleExport('all')}
+        disabled={loading !== null}
+        className={BUTTON}
       >
         <span>↓</span>
-        {loading ? 'Завантаження…' : 'Експорт .csv'}
+        {loading === 'all' ? 'Завантаження…' : 'Експорт .csv'}
+      </button>
+      <button
+        onClick={() => handleExport('emails')}
+        disabled={loading !== null}
+        title="Кожна адреса один раз; хто без email — з телефоном"
+        className={BUTTON}
+      >
+        <span>@</span>
+        {loading === 'emails' ? 'Завантаження…' : 'Email-и й телефони'}
       </button>
     </div>
   );
 }
+
+const BUTTON =
+  'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors whitespace-nowrap';
