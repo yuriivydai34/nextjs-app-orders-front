@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { apiFetch } from '@/app/lib/api';
 import { orderStats } from './order-stats';
 import { inactiveQuery, type InactiveRange } from './inactive-range';
-import { emailList } from './email-list';
+import { cleanEmails, emailList } from './email-list';
 
 type Row = Record<string, unknown>;
 type Seen = { value: string; firstSeen: string | null; lastSeen: string | null };
@@ -75,16 +75,6 @@ function toCsv(rows: Row[]): string {
   return lines.join('\r\n');
 }
 
-// One row per address, then phone-only rows for people without one: for a
-// mailing service, or calls and Viber where there is no email.
-function toEmailCsv(rows: Row[]): string {
-  const lines = [['Email', "Ім'я", 'Телефон', 'Виконаних замовлень', 'Остання покупка'].map(cell).join(SEP)];
-  for (const r of emailList(rows)) {
-    lines.push([r.email, r.name, r.phone, r.completed, r.lastPurchase].map(cell).join(SEP));
-  }
-  return lines.join('\r\n');
-}
-
 export default function ExportShopCustomersButton({
   search, sortBy, sortOrder, inactive,
 }: {
@@ -125,13 +115,16 @@ export default function ExportShopCustomersButton({
       }
 
       // BOM so Excel detects UTF-8 and does not mangle Cyrillic.
-      const csv = kind === 'emails' ? toEmailCsv(rows) : toCsv(rows);
-      const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+      // Emails: a plain list, one per line, to paste into a mailing service -
+      // only the good ones at the usual services (email-list.ts).
+      const blob = kind === 'emails'
+        ? new Blob([cleanEmails(emailList(rows)).join('\n') + '\n'], { type: 'text/plain;charset=utf-8;' })
+        : new Blob(['﻿' + toCsv(rows)], { type: 'text/csv;charset=utf-8;' });
       const href = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = href;
       const suffix = inactive ? `-not-bought-${inactive.key.replace(/-$/, 'plus')}d` : '';
-      link.download = `shop-${kind === 'emails' ? 'emails' : 'customers'}${suffix}-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.download = `shop-${kind === 'emails' ? 'emails' : 'customers'}${suffix}-${new Date().toISOString().slice(0, 10)}.${kind === 'emails' ? 'txt' : 'csv'}`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -157,11 +150,11 @@ export default function ExportShopCustomersButton({
       <button
         onClick={() => handleExport('emails')}
         disabled={loading !== null}
-        title="Кожна адреса один раз; хто без email — з телефоном"
+        title="Лише справжні адреси популярних поштовиків, по одній у рядку — без описок, вигаданих і службових"
         className={BUTTON}
       >
         <span>@</span>
-        {loading === 'emails' ? 'Завантаження…' : 'Email-и й телефони'}
+        {loading === 'emails' ? 'Завантаження…' : 'Email-и .txt'}
       </button>
     </div>
   );
