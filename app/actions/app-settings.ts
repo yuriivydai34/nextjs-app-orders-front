@@ -18,6 +18,8 @@ export type PackMix = {
 // (gaderia_mobile_admin_back src/app-setting).
 export type AppSettings = {
   new_carousel_enabled: boolean;
+  /** The promotions carousel at the top of the app (dashboard/banners). */
+  banners_enabled: boolean;
   // As 1.3.2; null when not set.
   min_app_version: string | null;
   latest_app_version: string | null;
