@@ -8,9 +8,9 @@ import { useState } from 'react';
 
 const navItems = [
   { href: '/dashboard/products', label: 'Продукти', icon: '📦' },
+  { href: '/dashboard/orders', label: 'Замовлення', icon: '📋' },
   { href: '/dashboard/banners', label: 'Акції', icon: '🏷' },
   { href: '/dashboard/own-sets', label: 'Поштучно', icon: '🧃' },
-  { href: '/dashboard/orders', label: 'Замовлення', icon: '📋' },
   { href: '/dashboard/reviews', label: 'Відгуки', icon: '★' },
   { href: '/dashboard/promo-codes', label: 'Промокоди', icon: '%' },
   { href: '/dashboard/bonuses', label: 'Бонуси', icon: '🎁' },
