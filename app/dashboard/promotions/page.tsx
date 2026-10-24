@@ -8,9 +8,9 @@ import {
   listBanners,
   reorderBanners,
   updateBanner,
-} from '@/app/actions/banners';
+} from '@/app/actions/promotions';
 import { getAppSettings, updateAppSettings } from '@/app/actions/app-settings';
-import BannerForm from './_components/banner-form';
+import BannerForm from './_components/promotion-form';
 
 function day(iso: string | null): string {
   if (!iso) return '';

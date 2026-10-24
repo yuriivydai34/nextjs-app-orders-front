@@ -9,7 +9,7 @@ import {
   bannerImageSrc,
   createBanner,
   updateBanner,
-} from '@/app/actions/banners';
+} from '@/app/actions/promotions';
 
 const INPUT =
   'w-full h-10 rounded-lg px-3 bg-gray-100 dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500';

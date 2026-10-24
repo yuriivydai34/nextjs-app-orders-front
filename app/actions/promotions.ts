@@ -29,7 +29,7 @@ export type BannerDraft = {
   image?: File | null;
 };
 
-const base = () => `${process.env.NEXT_PUBLIC_API_URL}/banners`;
+const base = () => `${process.env.NEXT_PUBLIC_API_URL}/promotions`;
 
 async function unwrap(res: Response) {
   if (res.ok) return res.json().catch(() => null);
