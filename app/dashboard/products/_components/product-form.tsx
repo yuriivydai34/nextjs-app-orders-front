@@ -29,8 +29,8 @@ export type Product = {
   is_active?: boolean;
   // In the app's "Новинки" carousel while it is switched on.
   is_new?: boolean;
-  // Juices by the bottle: a bottle, a ready box, or neither (empty).
-  own_sets_role?: 'single' | 'pack' | null;
+  // Juices by the bottle: a bottle, a ready box, a fixed set, or neither (empty).
+  own_sets_role?: 'single' | 'pack' | 'kit' | null;
   description?: string | null;
   shipment_weight?: number | null;
   shipment_length?: number | null;
@@ -323,8 +323,9 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
                 <option value="">Не стосується (оцет, яблука, мед, дегустаційні)</option>
                 <option value="single">Пляшка — продається поштучно</option>
                 <option value="pack">Коробка — ховається, коли продаємо поштучно</option>
+                <option value="kit">Набір кількох смаків — як пляшка, своя ціна</option>
               </select>
-              <span className="text-xs text-gray-400">Режим і мікси — на сторінці «Поштучно»</span>
+              <span className="text-xs text-gray-400">Режим — на сторінці «Поштучно»</span>
             </label>
           </div>
 
