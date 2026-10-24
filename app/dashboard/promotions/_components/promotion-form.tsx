@@ -162,7 +162,8 @@ export default function BannerForm({
               className="mt-2 block w-full text-sm text-gray-600 dark:text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-100 dark:file:bg-gray-800 file:text-gray-700 dark:file:text-gray-300"
             />
             <span className="text-xs text-gray-400">
-              JPEG, PNG або WebP, до 8 МБ. Ширші за 2000 px зменшуються.
+              JPEG, PNG або WebP, до 8 МБ. Ширші за 2000 px зменшуються. У застосунку картинка показується у пропорції 2:1
+              (наприклад, 1200×600), решта обрізається по краях.
               {banner && ' Без вибору файлу картинка лишиться теперішньою.'}
             </span>
           </div>
