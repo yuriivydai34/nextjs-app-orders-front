@@ -65,6 +65,9 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
   // Remounts the form so defaultValues come from the product just opened.
   const [openCount, setOpenCount] = useState(0);
   const [kind, setKind] = useState('');
+  // Needed as state, not just a field: a set has no flavour, so choosing one
+  // has to take the flavour field away.
+  const [role, setRole] = useState('');
   const [onSale, setOnSale] = useState(false);
   const [picture, setPicture] = useState('');
   const [badge, setBadge] = useState('');
@@ -76,6 +79,7 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
     setMode(nextMode);
     setSource(product);
     setKind(product?.type_product ?? '');
+    setRole(product?.own_sets_role ?? '');
     setOnSale(nextMode !== 'create' && Boolean(product?.is_discount));
     // The clean picture: the API draws the badge on it again when saving.
     setPicture(product?.picture_original ?? product?.picture ?? '');
@@ -93,6 +97,10 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
   }));
 
   const sub = SUBTYPE[kind];
+
+  // A ready-made set is several flavours in one box, so it has none of its own.
+
+  const isSet = role === 'kit';
   const p = source;
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -121,7 +129,7 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
       is_new: form.get('is_new') === 'on',
       own_sets_role: get('own_sets_role'),
     };
-    if (sub) data[sub.field] = get(sub.field);
+    if (sub && !isSet) data[sub.field] = get(sub.field);
 
     setSaving(true);
     setError(null);
@@ -166,7 +174,7 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
                   {PRODUCT_TYPES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
               </Field>
-              {sub ? (
+              {sub && !isSet ? (
                 <Field label={sub.label} required hint={kind === 'VINEGAR' ? 'Смак — у назві' : undefined}>
                   <select
                     key={kind}
@@ -317,7 +325,8 @@ const ProductForm = forwardRef<ProductFormHandle, { onSaved: () => void }>(funct
               <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Поштучний продаж</span>
               <select
                 name="own_sets_role"
-                defaultValue={p?.own_sets_role ?? ''}
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
                 className="h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm"
               >
                 <option value="">Не стосується (оцет, яблука, мед, дегустаційні)</option>
