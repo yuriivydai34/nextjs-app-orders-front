@@ -1,8 +1,10 @@
 import { apiFetch } from '../lib/api';
 
 // A box rule for juices by the bottle: bottles of `measurement` litres go in
-// boxes of `n`; `msg` has {N} for how many are missing.
-export type PackRule = { measurement: number; n: number; label: string; msg: string; enabled: boolean };
+// boxes of `n`; `msg` has {N} for how many are missing; `hint` is the caption
+// on a bottle's card ({N} is the box size; empty means none, absent means the
+// app writes its own).
+export type PackRule = { measurement: number; n: number; label: string; msg: string; hint?: string; enabled: boolean };
 
 // Switches in the app that the panel turns on and off without a release
 // (gaderia_mobile_admin_back src/app-setting).
