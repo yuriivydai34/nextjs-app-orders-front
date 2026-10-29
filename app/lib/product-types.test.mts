@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { productTypeLabel } from './product-types.ts';
 
 test('the type column in words, as the products actually are', () => {
-  assert.equal(productTypeLabel({ type_product: 'JUICE', type_juice: 'PEARAPPLE' }), 'Сік · Яблучно-грушевий');
+  assert.equal(productTypeLabel({ type_product: 'JUICE', type_juice: 'PEARAPPLE' }), 'Сік · Яблуко-груша');
   assert.equal(productTypeLabel({ type_product: 'VINEGAR', type_vinegar: 'BALSAMIC' }), 'Оцет · Бальзамічний');
   assert.equal(productTypeLabel({ type_product: 'APPLE', type_apple: 'GALA' }), 'Яблука · Гала');
 });
