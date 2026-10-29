@@ -7,6 +7,7 @@ import ProductActions from './_components/product-actions';
 import ProductForm, { type Product, type ProductFormHandle } from './_components/product-form';
 import SortProductsModal from './_components/sort-products-modal';
 import NewCarouselSwitch from './_components/new-carousel-switch';
+import ExportProductsButton from './_components/export-products-button';
 import { apiFetch } from '../../lib/api';
 import { productTypeLabel } from '@/app/lib/product-types.ts';
 
@@ -59,6 +60,7 @@ function ProductsContent() {
           {total > 0 && <span className="ml-2 text-sm font-normal text-gray-400">{total}</span>}
         </h2>
         <div className="flex items-center gap-2">
+          <ExportProductsButton />
           <button
             onClick={() => formRef.current?.create()}
             className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-300 transition-colors"
