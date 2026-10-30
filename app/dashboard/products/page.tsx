@@ -8,6 +8,7 @@ import ProductForm, { type Product, type ProductFormHandle } from './_components
 import SortProductsModal from './_components/sort-products-modal';
 import NewCarouselSwitch from './_components/new-carousel-switch';
 import ExportProductsButton from './_components/export-products-button';
+import ProductSearch from './_components/product-search';
 import { apiFetch } from '../../lib/api';
 import { productTypeLabel } from '@/app/lib/product-types.ts';
 
@@ -20,12 +21,13 @@ type ProductsResponse = {
 };
 
 
-const COLS = ['Картинка', 'Назва', 'Довжина', 'Ширина', 'Висота', 'Вага', 'Ціна', 'Тип', ''];
+const COLS = ['ID', 'Картинка', 'Назва', 'Довжина', 'Ширина', 'Висота', 'Вага', 'Ціна', 'Тип', ''];
 
 function ProductsContent() {
   useEffect(() => { document.title = 'Продукти | Gaderia'; }, []);
   const searchParams = useSearchParams();
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
+  const search = searchParams.get('search') ?? '';
 
   const [result, setResult] = useState<ProductsResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +39,9 @@ function ProductsContent() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?page=${page}&limit=10&sortBy=id_sort&sortOrder=ASC`)
+    const qs = new URLSearchParams({ page: String(page), limit: '10', sortBy: 'id_sort', sortOrder: 'ASC' });
+    if (search) qs.set('search', search);
+    apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/catalog?${qs.toString()}`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch products');
         return res.json();
@@ -45,7 +49,7 @@ function ProductsContent() {
       .then((data) => setResult(data))
       .catch(() => setError('Не вдалося завантажити товари.'))
       .finally(() => setLoading(false));
-  }, [page, reloadKey]);
+  }, [page, search, reloadKey]);
 
   const products = result?.data ?? [];
   const total = result?.total ?? 0;
@@ -60,6 +64,7 @@ function ProductsContent() {
           {total > 0 && <span className="ml-2 text-sm font-normal text-gray-400">{total}</span>}
         </h2>
         <div className="flex items-center gap-2">
+          <ProductSearch />
           <ExportProductsButton />
           <button
             onClick={() => formRef.current?.create()}
@@ -101,6 +106,9 @@ function ProductsContent() {
               <tbody>
                 {products.map((p) => (
                   <tr key={p.id} className="group hover:bg-gray-50 dark:hover:bg-gray-800/40">
+                    <td className="py-2 px-3 align-middle text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                      {p.id}
+                    </td>
                     <td className="py-2 px-3 align-middle">
                       <div style={{ maxWidth: 120, minWidth: 120 }}>
                         {p.picture ? (
