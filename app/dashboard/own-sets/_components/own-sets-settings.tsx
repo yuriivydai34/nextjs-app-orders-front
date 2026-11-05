@@ -194,6 +194,41 @@ export default function OwnSetsSettings() {
                   Покупець бачить (якщо бракує 2): {r.msg.replaceAll('{N}', '2')}. Розмір коробки в тексті впишіть самі: він не підставляється.
                 </span>
               </label>
+
+              <div>
+                <span className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  Коробка повного комплекту (довідково)
+                </span>
+                <div className="grid grid-cols-4 gap-2">
+                  <input
+                    type="number" step="0.1" min="0.1" placeholder="Д, см" title="Довжина, см"
+                    value={r.box_length ?? ''}
+                    onChange={(e) => editRule(i, { box_length: e.target.value ? Number(e.target.value) : undefined })}
+                    className={input}
+                  />
+                  <input
+                    type="number" step="0.1" min="0.1" placeholder="Ш, см" title="Ширина, см"
+                    value={r.box_width ?? ''}
+                    onChange={(e) => editRule(i, { box_width: e.target.value ? Number(e.target.value) : undefined })}
+                    className={input}
+                  />
+                  <input
+                    type="number" step="0.1" min="0.1" placeholder="В, см" title="Висота, см"
+                    value={r.box_height ?? ''}
+                    onChange={(e) => editRule(i, { box_height: e.target.value ? Number(e.target.value) : undefined })}
+                    className={input}
+                  />
+                  <input
+                    type="number" step="0.1" min="0.1" placeholder="кг" title="Вага, кг"
+                    value={r.box_weight ?? ''}
+                    onChange={(e) => editRule(i, { box_weight: e.target.value ? Number(e.target.value) : undefined })}
+                    className={input}
+                  />
+                </div>
+                <span className="block text-xs text-gray-400 mt-1">
+                  Для довідки менеджеру й накладної — застосунок замовлення рахує сам, це поле на нього не впливає.
+                </span>
+              </div>
             </div>
           ))}
           {loaded && rules.length === 0 && <p className="text-sm text-gray-500 dark:text-gray-400">Правил нема: пляшки можна замовляти в будь-якій кількості.</p>}

@@ -4,7 +4,12 @@ import { apiFetch } from '../lib/api';
 // boxes of `n`; `msg` has {N} for how many are missing; `hint` is the caption
 // on a bottle's card ({N} is the box size; empty means none, absent means the
 // app writes its own).
-export type PackRule = { measurement: number; n: number; label: string; msg: string; hint?: string; enabled: boolean };
+export type PackRule = {
+  measurement: number; n: number; label: string; msg: string; hint?: string; fullPrefix?: string; enabled: boolean;
+  // One full box's shipping size for Nova Poshta (kg, cm) — reference only,
+  // an order's real numbers come from app-server's own packing logic.
+  box_weight?: number; box_length?: number; box_width?: number; box_height?: number;
+};
 
 // Switches in the app that the panel turns on and off without a release
 // (gaderia_mobile_admin_back src/app-setting).
