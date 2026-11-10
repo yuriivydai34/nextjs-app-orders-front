@@ -17,6 +17,8 @@ type RecentOrder = {
 type TopProduct = { name: string; orders: number; revenue: number };
 type Overview = {
   totalOrders: number; cancelledOrders: number; revenue: number; customers: number;
+  // Current calendar month in Kyiv, not a rolling 30 days.
+  ordersThisMonth: number; revenueThisMonth: number;
   recentOrders: RecentOrder[]; topProducts: TopProduct[];
 };
 
@@ -58,6 +60,11 @@ export default function OverviewPage() {
             <StatCard label="Виручка (оплачені)" value={money(data.revenue)} />
             <StatCard label="Клієнти" value={String(data.customers)} />
             <StatCard label="Скасовано" value={String(data.cancelledOrders)} />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <StatCard label="Замовлень цього місяця" value={String(data.ordersThisMonth)} />
+            <StatCard label="Виручка цього місяця" value={money(data.revenueThisMonth)} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
