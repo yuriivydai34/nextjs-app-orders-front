@@ -69,12 +69,12 @@ export default function PushPage() {
       <form onSubmit={submit} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5 space-y-4">
         <label className="block">
           <span className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Заголовок</span>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={100} required className={INPUT} placeholder="Зігрійся по-стародавньому!" />
+          <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={100} required className={INPUT} placeholder="Текст заголовку" />
         </label>
 
         <label className="block">
           <span className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Текст</span>
-          <textarea value={body} onChange={(e) => setBody(e.target.value)} maxLength={500} required rows={3} className={`${INPUT} resize-y`} placeholder="Стародавні цілителі лікували імбиром…" />
+          <textarea value={body} onChange={(e) => setBody(e.target.value)} maxLength={500} required rows={3} className={`${INPUT} resize-y`} placeholder="Текст повідомлення" />
         </label>
 
         <label className="block">
