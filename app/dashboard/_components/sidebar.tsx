@@ -18,6 +18,7 @@ const navItems = [
   { href: '/dashboard/shop-customers', label: 'Покупці з сайту', icon: '🛒' },
   { href: '/dashboard/report', label: 'Звіти', icon: '📊' },
   { href: '/dashboard/overview', label: 'Огляд', icon: '▦' },
+  { href: '/dashboard/push', label: 'Push-сповіщення', icon: '🔔' },
   { href: '/dashboard/settings', label: 'Налаштування', icon: '⚙' },
 ];
 
