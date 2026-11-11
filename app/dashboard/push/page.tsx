@@ -1,7 +1,7 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
-import { sendPush } from '@/app/actions/push';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
+import { fetchRecentPush, PushLogEntry, sendPush } from '@/app/actions/push';
 
 const INPUT =
   'w-full rounded-lg px-3 py-2 bg-gray-100 dark:bg-gray-800 text-sm text-gray-900 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500';
@@ -16,6 +16,13 @@ export default function PushPage() {
   const [accountId, setAccountId] = useState('');
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [recent, setRecent] = useState<PushLogEntry[] | null>(null);
+
+  const loadRecent = useCallback(() => {
+    fetchRecentPush().then(setRecent).catch(() => setRecent([]));
+  }, []);
+
+  useEffect(() => { loadRecent(); }, [loadRecent]);
 
   const canSend = title.trim() !== '' && body.trim() !== '' && (!testOnly || accountId.trim() !== '');
 
@@ -39,6 +46,7 @@ export default function PushPage() {
         ok: true,
         text: testOnly ? `Надіслано акаунту ${accountId}` : 'Надіслано всім',
       });
+      loadRecent();
       if (broadcast) {
         setTitle('');
         setBody('');
@@ -117,6 +125,32 @@ export default function PushPage() {
           </button>
         </div>
       </form>
+
+      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-8 mb-3">Останні надіслані</h3>
+      {recent === null ? (
+        <p className="text-sm text-gray-500 dark:text-gray-400">Завантаження…</p>
+      ) : recent.length === 0 ? (
+        <p className="text-sm text-gray-500 dark:text-gray-400">Ще нічого не надсилали.</p>
+      ) : (
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800">
+          {recent.map((r) => (
+            <div key={r.id} className="px-5 py-3">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{r.title}</p>
+                <span className="shrink-0 text-xs text-gray-400">
+                  {new Date(r.createdAt).toLocaleString('uk-UA')}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">{r.body}</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {r.account_id ? `Акаунту ${r.account_id}` : 'Усім'}
+                {r.sent_by && ` · ${r.sent_by}`}
+                {r.message_id ? ' · прийнято Firebase' : ' · без message_id'}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
