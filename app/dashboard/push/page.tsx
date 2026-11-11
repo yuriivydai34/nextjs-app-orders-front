@@ -134,19 +134,28 @@ export default function PushPage() {
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 divide-y divide-gray-100 dark:divide-gray-800">
           {recent.map((r) => (
-            <div key={r.id} className="px-5 py-3">
-              <div className="flex items-start justify-between gap-3">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{r.title}</p>
-                <span className="shrink-0 text-xs text-gray-400">
-                  {new Date(r.createdAt).toLocaleString('uk-UA')}
-                </span>
+            <div key={r.id} className="px-5 py-3 flex items-start gap-3">
+              {r.image && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={r.image} alt="" title={r.image}
+                  className="w-12 h-12 shrink-0 rounded-lg object-contain bg-gray-50 dark:bg-gray-800"
+                />
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{r.title}</p>
+                  <span className="shrink-0 text-xs text-gray-400">
+                    {new Date(r.createdAt).toLocaleString('uk-UA')}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">{r.body}</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  {r.account_id ? `Акаунту ${r.account_id}` : 'Усім'}
+                  {r.sent_by && ` · ${r.sent_by}`}
+                  {r.message_id ? ' · прийнято Firebase' : ' · без message_id'}
+                </p>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">{r.body}</p>
-              <p className="text-xs text-gray-400 mt-1">
-                {r.account_id ? `Акаунту ${r.account_id}` : 'Усім'}
-                {r.sent_by && ` · ${r.sent_by}`}
-                {r.message_id ? ' · прийнято Firebase' : ' · без message_id'}
-              </p>
             </div>
           ))}
         </div>
