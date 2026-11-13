@@ -20,6 +20,7 @@ type Payment = {
   createdAt: number;
   updatedAt: string;
   cashier_check: { id?: string; message?: string } | null;
+  data?: Record<string, unknown> | null;
   full_name?: string | null;
   email?: string | null;
   number?: string | null;

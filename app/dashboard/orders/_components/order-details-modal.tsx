@@ -48,6 +48,7 @@ type Payment = {
   delivery_payment?: number | null;
   is_delivery_payment?: boolean;
   catalog_list_id: CatalogItem[];
+  data?: Record<string, unknown> | null;
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -215,6 +216,21 @@ export default function OrderDetailsModal({ payment }: { payment: Payment }) {
             <Row label="Дата створення">{createdDate}</Row>
             <Row label="ID платежу">{String(payment.id)}</Row>
           </section>
+
+          {/* LiqPay */}
+          {payment.data && (
+            <section className="flex flex-col gap-2">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Відповідь LiqPay</p>
+              <details className="rounded-lg border border-gray-100 dark:border-gray-800">
+                <summary className="cursor-pointer px-3 py-2 text-sm text-gray-600 dark:text-gray-300 select-none">
+                  Показати
+                </summary>
+                <pre className="px-3 py-2 text-xs text-gray-700 dark:text-gray-300 overflow-x-auto whitespace-pre-wrap break-all border-t border-gray-100 dark:border-gray-800">
+                  {JSON.stringify(payment.data, null, 2)}
+                </pre>
+              </details>
+            </section>
+          )}
 
           {/* Products */}
           {payment.catalog_list_id?.length > 0 && (
