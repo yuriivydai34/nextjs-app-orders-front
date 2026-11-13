@@ -87,6 +87,13 @@ function getDeliveryAddress(type: string | null | undefined, desc: Record<string
   return null;
 }
 
+// LiqPay's own fiscalization attempt (separate from our Checkbox call) fails
+// on almost every order, "success" or not, and is not something we act on —
+// hiding it so it does not read as a real problem.
+function withoutRro(data: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(data).filter(([key]) => !key.startsWith('rro')));
+}
+
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex gap-2 text-sm">
@@ -226,7 +233,7 @@ export default function OrderDetailsModal({ payment }: { payment: Payment }) {
                   Показати
                 </summary>
                 <pre className="px-3 py-2 text-xs text-gray-700 dark:text-gray-300 overflow-x-auto whitespace-pre-wrap break-all border-t border-gray-100 dark:border-gray-800">
-                  {JSON.stringify(payment.data, null, 2)}
+                  {JSON.stringify(withoutRro(payment.data), null, 2)}
                 </pre>
               </details>
             </section>
